@@ -1,4 +1,4 @@
 plateau
 =======
 
-Fit plateau climate envelopes to species presence/absence data
+Fit plateau climate envelopes in species distribution models for presence/absence data

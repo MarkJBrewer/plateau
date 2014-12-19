@@ -37,7 +37,7 @@
 #' @seealso \code{link{map.plot}}, \code{link{fit.bugs.env}}
 #' @export
 envelope.plot <- function(envelope.fit,type="persp",x.plot.lims=c(0,1),len=100,
-    plot.vars,x.labels,fix.values,close.points="",contour.levels,...){
+    plot.vars,x.labels,fix.values,close.points="",contour.levels){
     x.clim <- as.matrix(envelope.fit$x.clim)
     x.clim.names <- colnames(x.clim)
     n.x.clim <- ncol(x.clim)

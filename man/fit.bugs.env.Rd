@@ -9,9 +9,9 @@ fit.bugs.env(y, x.clim, car.sigma = 0.1, num, adj, u, prior.ax, prior.beta,
   burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
   working.directory = "C:/Program Files (x86)/WinBUGS14/",
   bugs.directory = "C:/Program Files (x86)/WinBUGS14/",
-  WinBUGS.debug = FALSE, estimate.p = FALSE, estimate.u = FALSE,
-  u.clique.start, u.clique.end, adj.clique.start, adj.clique.end, clique,
-  clique.i, WinBUGS.code = NULL, no.starting.value = NULL)
+  WinBUGS.debug = FALSE, WinBUGS.code = NULL, no.starting.value = NULL,
+  estimate.p = FALSE, estimate.u = FALSE, u.clique.start, u.clique.end,
+  adj.clique.start, adj.clique.end, clique, clique.i)
 }
 \arguments{
 \item{y}{The binary response variable (taking values 0 or 1 for absence and
@@ -92,6 +92,20 @@ default "C:/Program Files (x86)/WinBUGS14/" is for Windows
 \item{WinBUGS.debug}{Logical flag as to whether to close WinBUGS after
 running (default \code{FALSE} implies WinBUGS is closed).}
 
+\item{WinBUGS.code}{You can supply your own code file, especially useful if
+you want to use informative priors for external information; the default is
+\code{NULL}, and the code file must be in the same folder as specified by
+\code{working.directory}. The effect of a \code{NULL} value is to select
+either file \code{WinBUGS.txt}, or, in the case of a single climate
+variable, \code{WinBUGS1.txt}.}
+
+\item{no.starting.value}{A list of strings denoting the objects we should
+not initialise, usually because we set them or calculate them in a bespoke
+WinBUGS code file. These objects will be set to \code{NA} by this function;
+to use, create objects such as
+                          \code{list("beta[2,2]","ax[1]")}
+for example.}
+
 \item{estimate.p}{Logical flag specifying whether or not to retain samples
 for the posterior probabilities of presence for each cell,
 default \code{FALSE}; be aware using \code{TRUE} can result in slow
@@ -164,16 +178,6 @@ The variables in WinBUGS are (i indexes the climate variable):
                    between the climate variables; these are constrained
                    relative to the \code{betas} in order not to break the geometric
                    formula for a cone.}
-\item{\code{WinBUGS.code}}{You can supply your own code file, especially useful if
-                   you want to use informative priors for external information;
-                   the default is \code{NULL}, and the code file must be in the same
-                   folder as specified by \code{working.directory}.}
-\item{\code{no.starting.value}}{A list of strings denoting the objects we should not
-                   initialise, usually because we set them or calculate them in
-                   a bespoke WinBUGS code file. These objects will be set to \code{NA}
-                   by this function; create things like
-                          \code{list("beta[2,2]","ax[1]")}
-                   for example.}
 }
 }
 \description{

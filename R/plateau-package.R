@@ -12,7 +12,7 @@
 #' LazyLoad: \tab yes\cr
 #' }
 #'
-#' \code{\link{plot.envelope}} plots an envelope
+#' \code{\link{envelope.plot}} plots an envelope
 #'
 #' @name plateau-package
 #' @aliases plateau
@@ -22,6 +22,4 @@
 #' @references
 #' \url{https://github.com/MarkJBrewer/plateau}
 #' @keywords package
-#' @examples
-#' plot.envelope()
 NULL

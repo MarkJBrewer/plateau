@@ -20,10 +20,7 @@ License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }
 
-\code{\link{plot.envelope}} plots an envelope
-}
-\examples{
-plot.envelope()
+\code{\link{envelope.plot}} plots an envelope
 }
 \author{
 Mark J Brewer \email{Mark.Brewer@bioss.ac.uk}

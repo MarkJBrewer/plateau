@@ -4,8 +4,10 @@
 #' set of climate variable values.
 #'
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2.
-#' @param x.clim A matrix, the points in climate space at which to evaluate the
-#'  envelope and produce predictions in space.
+#' @param x.clim.new A matrix, having the same columns as \code{x.clim}, and
+#' containing the points in climate space at which to evaluate the
+#' envelope and produce predictions in space.
+#' @param x.clim The n by p matrix of climate covariates.
 #' @param coordinates An n by 2 matrix or list or data frame, having elements
 #'  (or columns) \code{long} and \code{lat} for longitude and latitude
 #' respectively.

@@ -6,7 +6,7 @@
 \usage{
 envelope.plot(envelope.fit, type = "persp", x.plot.lims = c(0, 1),
   len = 100, plot.vars, x.labels, fix.values, close.points = "",
-  contour.levels, ...)
+  contour.levels)
 }
 \arguments{
 \item{envelope.fit}{The fitted object from either \code{fit.glm.env} or

@@ -1,7 +1,7 @@
 #' Plot the plateau envelopes produced by \code{fit.glm.env} and
 #' \code{fit.bugs.env}.
 #'
-#' \code{plot.envelope} plots the plateau envelopes produced by the functions
+#' \code{envelope.plot} plots the plateau envelopes produced by the functions
 #' \code{fit.glm.env} and \code{fit.bugs.env}.
 #'
 #' @param envelope.fit The fitted object from either \code{fit.glm.env} or
@@ -34,9 +34,9 @@
 #' either a contour plot or a perspective plot is produced. For three climate
 #' covariates, the same choice of contour or perspective plot is made for two
 #' of the variables for a fixed value of the third covariate.
-#' @seealso \code{link{plot.envelope}}, \code{link{fit.bugs.env}}
+#' @seealso \code{link{map.plot}}, \code{link{fit.bugs.env}}
 #' @export
-plot.envelope <- function(envelope.fit,type="persp",x.plot.lims=c(0,1),len=100,
+envelope.plot <- function(envelope.fit,type="persp",x.plot.lims=c(0,1),len=100,
     plot.vars,x.labels,fix.values,close.points="",contour.levels,...){
     x.clim <- as.matrix(envelope.fit$x.clim)
     x.clim.names <- colnames(x.clim)

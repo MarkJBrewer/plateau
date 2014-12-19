@@ -1,6 +1,6 @@
 #' Plot maps showing predictions for a given set of climate data.
 #'
-#' \code{plot.map} plots the fitted maps of "climate suitability" for a given
+#' \code{map.plot} plots the fitted maps of "climate suitability" for a given
 #' set of climate variable values.
 #'
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2.
@@ -18,9 +18,9 @@
 #' (if available).
 #'
 #' @return Map of predictions of "climate suitability".
-#' @seealso \code{link{plot.envelope}}
+#' @seealso \code{link{envelope.plot}}
 #' @export
-plot.map <- function(pars,x.clim.new,x.clim,coordinates,species.name="",scenario.name="",
+map.plot <- function(pars,x.clim.new,x.clim,coordinates,species.name="",scenario.name="",
     save.PDF=FALSE,file.name){
     if(save.PDF & missing(file.name)){
         file.name <- paste("Map",species.name,scenario.name,".pdf",sep="")

@@ -41,8 +41,8 @@
 #' \item{\code{message}}{Any message from \code{optim()}.}
 #' \item{\code{y}}{The response data, returned mainly to aid the plotting
 #' functions.}
-#' }
 #' \item{\code{x.clim}}{The climate data, also for the plotting functions.}
+#' }
 #' @export
 fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=100,
     constrain.beta=FALSE,slope.limit=7){

@@ -51,8 +51,8 @@ status; beware that 0 does not reliably mean "good" convergence.}
 \item{\code{message}}{Any message from \code{optim()}.}
 \item{\code{y}}{The response data, returned mainly to aid the plotting
 functions.}
-}
 \item{\code{x.clim}}{The climate data, also for the plotting functions.}
+}
 }
 \description{
 \code{fit.glm.env} fits a plateau envelope via a (non-spatial) GLM and

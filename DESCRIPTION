@@ -1,9 +1,8 @@
 Package: plateau
-Title: What the package does (one line)
-Version: 0.1
-Authors@R: "First Last <first.last@example.com> [aut, cre]"
+Title: Fit plateau climate envelopes in species distribution models for presence/absence data
+Version: 0.1.1
+Authors@R: "Mark J Brewer <mark.brewer@bioss.ac.uk> [aut, cre]"
 Description: What the package does (one paragraph)
-Depends:
-    R (>= 3.1.2)
-License: What license is it under?
+Depends: R2WinBUGS, mgcv
+License: GPL-2 | GPL-3
 LazyData: true

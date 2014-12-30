@@ -128,7 +128,7 @@ generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,p
             }
         }
     }else{ # when n.x.clim==1, use GAM
-        require(mgcv)
+        #require(mgcv)
         gam.formula <- as.formula("y~s(x1)")
         unigamfit <- gam(gam.formula,family=binomial,data=gamdata)
         plot(unigamfit)

@@ -450,7 +450,7 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
     print(which.beta)
     WinBUGS.data$which.beta <- which.beta
 
-    require(R2WinBUGS)
+    #require(R2WinBUGS)
     cat("Starting WinBUGS run - opening WinBUGS now...\n")
     results <- bugs(WinBUGS.data,WinBUGS.inits,WinBUGS.monitor,WinBUGS.model,
         chains,post.burnin+burnin,burnin,thin,

@@ -8,7 +8,7 @@ fit.bugs.env(y, x.clim, car.sigma = 0.1, num, adj, u, prior.ax, prior.beta,
   prior.beta0.difference, constrain.beta, initial.pars.input,
   informative.priors = list(beta = FALSE, beta0 = FALSE, ax = FALSE),
   burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
-  working.directory = "C:/Program Files (x86)/WinBUGS14/",
+  working.directory = NULL,
   bugs.directory = "C:/Program Files (x86)/WinBUGS14/",
   WinBUGS.debug = FALSE, WinBUGS.code = NULL, no.starting.value = NULL,
   estimate.p = FALSE, estimate.u = FALSE, u.clique.start, u.clique.end,
@@ -84,6 +84,7 @@ be retained (default 1000).}
 
 \item{working.directory}{String containing the location of the WinBUGS files
 WinBUGS.txt, WinBUGS1.txt and WinBUGSinform.txt, default
+NULL.
 "C:/Program Files (x86)/WinBUGS14/".}
 
 \item{bugs.directory}{String containing location of WinBUGS installation;

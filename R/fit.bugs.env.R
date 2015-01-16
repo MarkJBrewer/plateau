@@ -56,7 +56,8 @@
 #' @param thin Scalar, the thinning to apply to the MCMC iterations (default 1).
 #' @param working.directory String containing the location of the WinBUGS files
 #' WinBUGS.txt, WinBUGS1.txt and WinBUGSinform.txt, default
-#' "C:/Program Files (x86)/WinBUGS14/".
+#' NULL.
+##' "C:/Program Files (x86)/WinBUGS14/".
 #' @param bugs.directory String containing location of WinBUGS installation;
 #' default "C:/Program Files (x86)/WinBUGS14/" is for Windows
 #' 64-bit machines.
@@ -144,12 +145,22 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
     prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
     burnin=5000,post.burnin=1000,chains=2,thin=1,
-    working.directory="C:/Program Files (x86)/WinBUGS14/",
+    working.directory=NULL,
     bugs.directory="C:/Program Files (x86)/WinBUGS14/",
     WinBUGS.debug=FALSE,WinBUGS.code=NULL,no.starting.value=NULL,
     estimate.p=FALSE,estimate.u=FALSE,
     u.clique.start,u.clique.end,adj.clique.start,adj.clique.end,clique,clique.i){
 
+    plateau.package.directory <- paste(path.package("plateau"),"/models/",sep="")
+    # Move to working directory or temporary directory when NULL
+    inTempDir <- FALSE
+    if(is.null(working.directory)) {
+        working.directory <- tempdir()
+        savedWD <- getwd()
+        setwd(working.directory)
+        on.exit(setwd(savedWD), add = TRUE)
+        inTempDir <- TRUE
+    }
     x.clim <- as.matrix(x.clim)
     n.x.clim <- ncol(x.clim)
     beta.top <- 2*n.x.clim
@@ -209,9 +220,9 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
         WinBUGS.model <- WinBUGS.code
     }else{
         if(n.x.clim==1){
-            WinBUGS.model <- "WinBUGS1.txt"
+            WinBUGS.model <- paste(plateau.package.directory,"WinBUGS1.txt",sep="")
         }else{
-            WinBUGS.model <- "WinBUGS.txt"
+            WinBUGS.model <- paste(plateau.package.directory,"WinBUGS.txt",sep="")
         }
     }
     if(missing(constrain.beta)){

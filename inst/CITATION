@@ -1,0 +1,20 @@
+citHeader("To cite plateau in publications use:")
+
+citEntry(entry       = "article",
+	title        = "Climate Envelopes for Species Distribution Models",
+	author       = c(
+			person(given="M.J.", family="Brewer", email="Mark.Brewer@bioss.ac.uk"),
+			person(given="R.B.", family="O'Hara"),
+      person(given="B.J.", family="Anderson"),
+			person(given="R.", family="Ohlemueller")),
+	journal      = "Methods in Ecology and Evolution (hopefully)",
+	year         = 2015,
+	pages        = "1--2",
+	number       = 1,
+  volume       = 1,
+	url          = "",
+	textVersion  = paste("Brewer, M.J., O'Hara, R.B., Anderson, B.J. and Ohlemueller, R. (2015).",
+		"Climate Envelopes for Species Distribution Models",
+		"Methods in Ecology and Evolution (possibly submitted)")
+	)
+

@@ -44,8 +44,8 @@
 #' \item{\code{x.clim}}{The climate data, also for the plotting functions.}
 #' }
 #' @export
-fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=100,
-    constrain.beta=FALSE,slope.limit=7){
+fit.glm.env <- function(y,x.clim,x.noncliminitial.pars.input,
+    random.search=FALSE,n.iter=100,constrain.beta=FALSE,slope.limit=7){
     x.clim <- as.matrix(x.clim)
     n.x.clim <- ncol(x.clim)
     # Now standardise the climate variables by mapping onto [0,1]

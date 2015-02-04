@@ -6,6 +6,7 @@
 #' @param y The binary response variable (taking values 0 or 1 for absence and
 #' presence respectively).
 #' @param x.clim The n by p matrix of climate covariates.
+#' @param x.nonclim The n by p2 matrix of climate covariates.
 #' @param car.sigma Standard deviation of the WinBUGS \code{car.normal}
 #' process; needs to be a constant in the case of a binary response.
 #' @param num A vector (length n) of the numbers of neighbours of each cell, in
@@ -141,8 +142,8 @@
 #'                    formula for a cone.}
 #' }
 #' @export
-fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
-    prior.beta0.difference,constrain.beta,initial.pars.input,
+fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
+    prior.ax,prior.beta,prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
     burnin=5000,post.burnin=1000,chains=2,thin=1,
     working.directory=NULL,
@@ -207,9 +208,11 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
     nonsingleton.clique.list <- which(clique.length>1.5)
     if(missing(initial.pars.input)){
         if(missing(constrain.beta)){
-            initial.object <- generate.initial.values(y=y,x.clim=x.clim.std)
+            initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,
+                x.nonclim=x.nonclim)
         }else{
-            initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,constrain.beta=constrain.beta)
+            initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,
+                x.nonclim=x.nonclim,constrain.beta=constrain.beta)
         }
         initial.pars <- initial.object$initial.pars
         constrain.beta <- initial.object$constrain.beta
@@ -219,11 +222,16 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
     if(!is.null(WinBUGS.code)){
         WinBUGS.model <- WinBUGS.code
     }else{
-        if(n.x.clim==1){
-            WinBUGS.model <- paste(plateau.package.directory,"WinBUGS1.txt",sep="")
+        if(is.null(x.nonclim)){
+            WinBUGS.model <- write.bugs.model(n.x.clim)
         }else{
-            WinBUGS.model <- paste(plateau.package.directory,"WinBUGS.txt",sep="")
+            WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim))
         }
+#         if(n.x.clim==1){
+#             WinBUGS.model <- paste(plateau.package.directory,"WinBUGS1.txt",sep="")
+#         }else{
+#             WinBUGS.model <- paste(plateau.package.directory,"WinBUGS.txt",sep="")
+#         }
     }
     if(missing(constrain.beta)){
         constrain.beta <- matrix(rep(FALSE,2*n.x.clim),ncol=2)
@@ -338,6 +346,11 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
     }
     if(estimate.u){
         WinBUGS.monitor <- c(WinBUGS.monitor,"u")
+    }
+    if(!is.null(x.nonclim)){
+        WinBUGS.data$x.nonclim <- x.nonclim
+        WinBUGS.data$NnonEnv <- ncol(x.nonclim)
+        WinBUGS.monitor <- c(WinBUGS.monitor,"nonbeta")
     }
     WinBUGS.inits <- list()
     n.data <- length(y)
@@ -500,6 +513,7 @@ fit.bugs.env <- function(y,x.clim,car.sigma=0.1,num,adj,u,prior.ax,prior.beta,
     results$par <- parvec
     results$y <- y
     results$x.clim <- x.clim
+    results$x.nonclim <- x.nonclim
     results$which.beta <- which.beta
 
     return(results)

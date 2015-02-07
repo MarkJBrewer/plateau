@@ -4,10 +4,10 @@
 \alias{fit.bugs.env}
 \title{Fit a spatial, Bayesian, plateau envelope model via MCMC in WinBUGS}
 \usage{
-fit.bugs.env(y, x.clim, car.sigma = 0.1, num, adj, u, prior.ax, prior.beta,
-  prior.beta0.difference, constrain.beta, initial.pars.input,
-  informative.priors = list(beta = FALSE, beta0 = FALSE, ax = FALSE),
-  burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
+fit.bugs.env(y, x.clim, x.nonclim = NULL, car.sigma = 0.1, num, adj, u,
+  prior.ax, prior.beta, prior.beta0.difference, constrain.beta,
+  initial.pars.input, informative.priors = list(beta = FALSE, beta0 = FALSE,
+  ax = FALSE), burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
   working.directory = NULL,
   bugs.directory = "C:/Program Files (x86)/WinBUGS14/",
   WinBUGS.debug = FALSE, WinBUGS.code = NULL, no.starting.value = NULL,
@@ -19,6 +19,8 @@ fit.bugs.env(y, x.clim, car.sigma = 0.1, num, adj, u, prior.ax, prior.beta,
 presence respectively).}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
+
+\item{x.nonclim}{The n by p2 matrix of climate covariates.}
 
 \item{car.sigma}{Standard deviation of the WinBUGS \code{car.normal}
 process; needs to be a constant in the case of a binary response.}

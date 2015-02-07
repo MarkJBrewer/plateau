@@ -4,14 +4,17 @@
 \alias{fit.glm.env}
 \title{Fit a plateau envelope via a (non-spatial) GLM and non-linear optimisation}
 \usage{
-fit.glm.env(y, x.clim, initial.pars.input, random.search = FALSE,
-  n.iter = 100, constrain.beta = FALSE, slope.limit = 7)
+fit.glm.env(y, x.clim, x.nonclim = NULL, initial.pars.input,
+  random.search = FALSE, n.iter = 100, constrain.beta = FALSE,
+  slope.limit = 7)
 }
 \arguments{
 \item{y}{The binary response variable (taking values 0 or 1 for absence and
 presence respectively).}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
+
+\item{x.nonclim}{The n by p2 matrix of climate covariates.}
 
 \item{initial.pars.input}{A vector of length 2p+p+2+p(p-1)/2 containing
 starting values for each parameter; if missing, the code will suggest

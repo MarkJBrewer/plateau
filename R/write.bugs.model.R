@@ -8,6 +8,12 @@
 write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
 
     # WinBUGS code as a function
+    #NClique <- car.tau <- nonbeta <- beta0 <- az <- ax.var <- beta0.diff <- beta0.var <- beta0.mu <- N <- NEnv <- 1
+    #u.clique.start <- u.clique.end <- nonsingleton.clique.list <- x.clim.Total <- x.clim.Total.tmp <- ax <- which.beta <- p <- y <- numeric(10)
+    #adj.clique.start <- adj.clique.end <- adj <- clique <- clique.u <- numeric(10)
+    #x.clim <- min.gamma.1 <- min.gamma.2 <- max.gamma.1 <- max.gamma.2 <- array(NA,dim=c(10,10))
+    #min.gamma <- max.gamma <- gamma.temp <- x.clim.CalcCrossColSum <- gamma <- x.clim.Calc <- x.clim.Calc2 <- x.clim.C <- beta <- array(NA,dim=c(10,10))
+    #x.clim.CalcCross <- x.clim.beta <- array(NA,dim=c(10,10,10))
     if(n.x.nonclim==0 && n.x.clim>1.5){
         envmodel <- function(){
             pi <- 3.141592
@@ -83,41 +89,43 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
         }
     }
     if(n.x.nonclim==0 && n.x.clim==1){
-        pi <- 3.141592
-        piover2 <- pi/2
-        for(i in 1:N) {
-            y[i] ~ dbern(p[i])
-            for(e in 1:NEnv){
-                x.clim.C[i,e] <- x.clim[i,e]-ax
-                x.clim.beta[i,e,1] <- -beta[e,1]*x.clim.C[i,e]
-                x.clim.beta[i,e,2] <- beta[e,which.beta]*x.clim.C[i,e]
-                x.clim.Calc2[i,e] <- max(x.clim.beta[i,e,1],x.clim.beta[i,e,2])
-                x.clim.Calc[i,e] <- x.clim.Calc2[i,e]*abs(x.clim.C[i,e])
+        envmodel <- function(){
+            pi <- 3.141592
+            piover2 <- pi/2
+            for(i in 1:N) {
+                y[i] ~ dbern(p[i])
+                for(e in 1:NEnv){
+                    x.clim.C[i,e] <- x.clim[i,e]-ax
+                    x.clim.beta[i,e,1] <- -beta[e,1]*x.clim.C[i,e]
+                    x.clim.beta[i,e,2] <- beta[e,which.beta]*x.clim.C[i,e]
+                    x.clim.Calc2[i,e] <- max(x.clim.beta[i,e,1],x.clim.beta[i,e,2])
+                    x.clim.Calc[i,e] <- x.clim.Calc2[i,e]*abs(x.clim.C[i,e])
+                }
+                x.clim.CalcSum[i] <- sum(x.clim.Calc[i,1:NEnv])
+                x.clim.Total.tmp[i] <- az - sqrt(x.clim.CalcSum[i])
+                x.clim.Total[i] <- min(x.clim.Total.tmp[i], beta0)
+                logit(p[i]) <- x.clim.Total[i] + u[u.clique.start[clique[i]]+clique.i[i]-1]
             }
-            x.clim.CalcSum[i] <- sum(x.clim.Calc[i,1:NEnv])
-            x.clim.Total.tmp[i] <- az - sqrt(x.clim.CalcSum[i])
-            x.clim.Total[i] <- min(x.clim.Total.tmp[i], beta0)
-            logit(p[i]) <- x.clim.Total[i] + u[u.clique.start[clique[i]]+clique.i[i]-1]
-        }
-        beta0.prec <- 1/beta0.var
-        beta0.diff ~ dnorm(beta0.mu,beta0.prec)
-        az ~ dnorm(0,0.1)
-        beta0 <- az - exp(beta0.diff)
-        for(i in 1:NonSingletonClique){
-            clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]]-u.clique.start[nonsingleton.clique.list[i]]+1
-            u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
-        }
-        for(k in 1:adj.clique.end[NClique]) {
-            weights[k] <- 1
-        }
-        tau <- car.tau
-        ax.prec <- 1/ax.var
-        ax ~ dnorm(ax.mu,ax.prec)%_%I(-1,2)
-        for(e in 1:NEnv){
-            beta.prec[e,1] <- 1/beta.var[e,1]
-            beta.prec[e,2] <- 1/beta.var[e,2]
-            beta[e,1] ~ dnorm(beta.mu[e,1],beta.prec[e,1])%_%I(0,)
-            beta[e,2] ~ dnorm(beta.mu[e,2],beta.prec[e,2])%_%I(0,)
+            beta0.prec <- 1/beta0.var
+            beta0.diff ~ dnorm(beta0.mu,beta0.prec)
+            az ~ dnorm(0,0.1)
+            beta0 <- az - exp(beta0.diff)
+            for(i in 1:NonSingletonClique){
+                clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]]-u.clique.start[nonsingleton.clique.list[i]]+1
+                u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
+            }
+            for(k in 1:adj.clique.end[NClique]) {
+                weights[k] <- 1
+            }
+            tau <- car.tau
+            ax.prec <- 1/ax.var
+            ax ~ dnorm(ax.mu,ax.prec)%_%I(-1,2)
+            for(e in 1:NEnv){
+                beta.prec[e,1] <- 1/beta.var[e,1]
+                beta.prec[e,2] <- 1/beta.var[e,2]
+                beta[e,1] ~ dnorm(beta.mu[e,1],beta.prec[e,1])%_%I(0,)
+                beta[e,2] ~ dnorm(beta.mu[e,2],beta.prec[e,2])%_%I(0,)
+            }
         }
     }
     if(n.x.nonclim>0.5 && n.x.clim>1.5){
@@ -150,7 +158,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
                 x.clim.Total.tmp[i] <- az - sqrt(x.clim.CalcSum[i] + x.clim.CalcCrossSum[i])
                 x.clim.Total[i] <- min(x.clim.Total.tmp[i], beta0)
                 for(e in 1:NnonEnv){
-                    x.nonclim.Calc[i,e] <- nonbeta[e]*x.nonclim[i,e]
+                    x.nonclim.Calc[i,e] <- nonbeta[e]*(x.nonclim[i,e]-mean(x.nonclim[,e]))
                 }
                 x.nonclim.Total[i] <- sum(x.nonclim.Calc[i,1:NnonEnv])
                 logit(p[i]) <- x.clim.Total[i] + x.nonclim.Total[i] + u[u.clique.start[clique[i]]+clique.i[i]-1]
@@ -216,7 +224,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
                 x.clim.Total.tmp[i] <- az - sqrt(x.clim.CalcSum[i])
                 x.clim.Total[i] <- min(x.clim.Total.tmp[i], beta0)
                 for(e in 1:NnonEnv){
-                    x.nonclim.Calc[i,e] <- nonbeta[e]*x.nonclim[i,e]
+                    x.nonclim.Calc[i,e] <- nonbeta[e]*(x.nonclim[i,e]-mean(x.nonclim[,e]))
                 }
                 x.nonclim.Total[i] <- sum(x.nonclim.Calc[i,1:NnonEnv])
                 logit(p[i]) <- x.clim.Total[i] + x.nonclim.Total[i] + u[u.clique.start[clique[i]]+clique.i[i]-1]
@@ -248,5 +256,6 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
     }
 
     write.model(envmodel, "WinBUGSmodel.txt")
+    return("WinBUGSmodel.txt")
 
 }

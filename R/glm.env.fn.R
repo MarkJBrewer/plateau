@@ -32,9 +32,9 @@ glm.env.fn <- function(pars,y,x.clim,x.nonclim=NULL,constrain.beta=FALSE,
         ax.vec <- env.fn.object$ax.vec
         # exp.offset <- exp(offset(x.envelope))
         if(is.null(x.nonclim)){
-            glm.temp <- glm(y~offset(newx)-1,family=binomial)
+            glm.temp <- glm(y~offset(x.envelope)-1,family=binomial)
         }else{
-            glm.temp <- glm(y~offset(newx)-1+x.nonclim,family=binomial)
+            glm.temp <- glm(y~offset(x.envelope)-1+x.nonclim,family=binomial)
         }
         glm.deviance <- glm.temp$deviance
         # Impose penalty on the difference between the two betas for the same

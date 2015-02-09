@@ -152,7 +152,7 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     estimate.p=FALSE,estimate.u=FALSE,
     u.clique.start,u.clique.end,adj.clique.start,adj.clique.end,clique,clique.i){
 
-    plateau.package.directory <- paste(path.package("plateau"),"/models/",sep="")
+    #plateau.package.directory <- paste(path.package("plateau"),"/models/",sep="")
     # Move to working directory or temporary directory when NULL
     inTempDir <- FALSE
     if(is.null(working.directory)) {
@@ -348,7 +348,7 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
         WinBUGS.monitor <- c(WinBUGS.monitor,"u")
     }
     if(!is.null(x.nonclim)){
-        WinBUGS.data$x.nonclim <- x.nonclim
+        WinBUGS.data$x.nonclim <- as.matrix(x.nonclim)
         WinBUGS.data$NnonEnv <- ncol(x.nonclim)
         WinBUGS.monitor <- c(WinBUGS.monitor,"nonbeta")
     }

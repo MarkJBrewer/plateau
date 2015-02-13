@@ -13,7 +13,7 @@ presence respectively).}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
 
-\item{x.nonclim}{The n by p2 matrix of climate covariates.}
+\item{x.nonclim}{The n by p2 matrix of non-climate covariates.}
 
 \item{constrain.beta}{Should ridge penalty be imposed on the betas (slopes)?}
 

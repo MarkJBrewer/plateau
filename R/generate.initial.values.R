@@ -7,7 +7,7 @@
 #' @param y The binary response variable (taking values 0 or 1 for absence and
 #' presence respectively).
 #' @param x.clim The n by p matrix of climate covariates.
-#' @param x.nonclim The n by p2 matrix of climate covariates.
+#' @param x.nonclim The n by p2 matrix of non-climate covariates.
 #' @param constrain.beta Should ridge penalty be imposed on the betas (slopes)?
 #' @param random Logical flag on whether or not to generate random starting values
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2
@@ -107,7 +107,9 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
         # Try univariate fits to set starting values az and beta0
         for(i in 1:n.x.clim){
             # Calling fit.glm.env recursively
+        print("Before glm call in generate.initial.values")
             fitted.envelope.glm <- fit.glm.env(y=y,x.clim=x.clim[,i])
+        print("Before glm call in generate.initial.values")
             if(fitted.envelope.glm$par[1]>beta.init[1+(i-1)*2]){
                 beta.init[1+(i-1)*2] <- fitted.envelope.glm$par[1]
             }

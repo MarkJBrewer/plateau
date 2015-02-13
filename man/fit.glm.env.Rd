@@ -14,7 +14,7 @@ presence respectively).}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
 
-\item{x.nonclim}{The n by p2 matrix of climate covariates.}
+\item{x.nonclim}{The n by p2 matrix of non-climate covariates.}
 
 \item{initial.pars.input}{A vector of length 2p+p+2+p(p-1)/2 containing
 starting values for each parameter; if missing, the code will suggest

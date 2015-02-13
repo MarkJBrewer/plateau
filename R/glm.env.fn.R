@@ -9,7 +9,10 @@
 #' @param y The binary response variable (taking values 0 or 1 for absence and
 #' presence respectively).
 #' @param x.clim The n by p matrix of climate covariates.
-#' @param x.nonclim The n by p2 matrix of climate covariates.
+#' @param x.nonclim The n by p2 matrix of non-climate covariates (default
+#' \code{NULL}).
+#' @param x.nonclim.formula The pre-specified formula if non-climate variables
+#' are included.
 #' @param constrain.beta Should a ridge penalty be imposed on the betas
 #' (slopes)? Takes the form either of: a matrix of dimension p by 2
 #' (specifying \code{TRUE} for a ridge penalty for a given beta, or
@@ -20,21 +23,21 @@
 #' @return The (scalar) deviance for fitted GLM using specified envelope
 #' (possibly including a ridge penalty if set).
 #' @export
-glm.env.fn <- function(pars,y,x.clim,x.nonclim=NULL,constrain.beta=FALSE,
-    slope.limit=7){
+glm.env.fn <- function(pars,y,x.clim,x.nonclim=NULL,x.nonclim.formula=NULL,
+    constrain.beta=FALSE,slope.limit=7){
     n.x.clim <- ncol(x.clim)
     env.fn.object <- env.fn(pars=pars,x.clim=x.clim,slope.limit=slope.limit)
     x.envelope <- env.fn.object$x.envelope
-    if(sum(env.fn.object$x.envelope)==0){
+    if(mean(env.fn.object$x.envelope) < -2000){
         return(9e100)
     }else{
         beta.mat <- env.fn.object$beta.mat
         ax.vec <- env.fn.object$ax.vec
-        # exp.offset <- exp(offset(x.envelope))
         if(is.null(x.nonclim)){
             glm.temp <- glm(y~offset(x.envelope)-1,family=binomial)
         }else{
-            glm.temp <- glm(y~offset(x.envelope)-1+x.nonclim,family=binomial)
+            tempdata <- data.frame(y,x.envelope,x.nonclim)
+            glm.temp <- try(glm(x.nonclim.formula,data=tempdata,family=binomial))
         }
         glm.deviance <- glm.temp$deviance
         # Impose penalty on the difference between the two betas for the same

@@ -11,6 +11,10 @@
 #' containing the points in climate space at which to evaluate the
 #' envelope and produce predictions in space.
 #' @param x.clim The n by p matrix of climate covariates.
+#' @param x.nonclim The n by p2 matrix of non-climate covariates (default
+#' \code{NULL}).
+#' @param pars.nonclim A vector of length p2 specifying the parameter estimates
+#' to be used in prediction for the non-climate
 #' @param coordinates An n by 2 matrix or list or data frame, having elements
 #'  (or columns) \code{long} and \code{lat} for longitude and latitude
 #' respectively.
@@ -25,8 +29,8 @@
 #' @return Map of predictions of "climate suitability".
 #' @seealso \code{link{envelope.plot}}
 #' @export
-map.plot <- function(inputs,x.clim.new,x.clim,coordinates,species.name="",scenario.name="",
-    save.PDF=FALSE,file.name){
+map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
+    coordinates,species.name="",scenario.name="",save.PDF=FALSE,file.name){
     plot.type <- "Prediction"
     if(is.logical(inputs)){
         plot.type <- "Presences"
@@ -48,8 +52,15 @@ map.plot <- function(inputs,x.clim.new,x.clim,coordinates,species.name="",scenar
             x.clim.std[,i] <- (x.clim.new[,i]-x.clim.min[i])/(x.clim.max[i]-x.clim.min[i])
         }
         x.envelope <- env.fn(inputs,x.clim.std)$x.envelope
-        plot.p <- 1/(1+exp(x.envelope))
-        plot.p <- round(plot.p*1000)
+        # Check the columns of x.nonclim are in the same order as the coefficients
+        if(!is.null(x.nonclim)){
+            x.nonclim <- as.matrix(x.nonclim[names(pars.nonclim)])
+            nonlinpart <- x.nonclim%*%pars.nonclim
+        }else{
+            nonlinpart <- 0
+        }
+        linpred <- x.envelope+nonlinpart
+        plot.p <- 1/(1+exp(linpred))        plot.p <- round(plot.p*1000)
         palette(grey(seq(0,1,len=1001)))
     }else{
         plot.p <- 15*inputs+1

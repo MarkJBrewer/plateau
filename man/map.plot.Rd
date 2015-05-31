@@ -4,8 +4,9 @@
 \alias{map.plot}
 \title{Plot maps showing predictions for a given set of climate data.}
 \usage{
-map.plot(inputs, x.clim.new, x.clim, coordinates, species.name = "",
-  scenario.name = "", save.PDF = FALSE, file.name)
+map.plot(inputs, x.clim.new, x.clim, x.nonclim = NULL, pars.nonclim = NULL,
+  coordinates, species.name = "", scenario.name = "", save.PDF = FALSE,
+  file.name)
 }
 \arguments{
 \item{inputs}{If a numeric vector, then it contains the envelope parameters and has length 2p+p+2+p(p-1)/2.
@@ -18,6 +19,12 @@ containing the points in climate space at which to evaluate the
 envelope and produce predictions in space.}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
+
+\item{x.nonclim}{The n by p2 matrix of non-climate covariates (default
+\code{NULL}).}
+
+\item{pars.nonclim}{A vector of length p2 specifying the parameter estimates
+to be used in prediction for the non-climate}
 
 \item{coordinates}{An n by 2 matrix or list or data frame, having elements
  (or columns) \code{long} and \code{lat} for longitude and latitude

@@ -4,14 +4,16 @@
 \alias{generate.initial.values}
 \title{Generate initial values for plateau envelopes}
 \usage{
-generate.initial.values(y, x.clim, constrain.beta = FALSE, random = FALSE,
-  pars)
+generate.initial.values(y, x.clim, x.nonclim = NULL, constrain.beta = FALSE,
+  random = FALSE, pars)
 }
 \arguments{
 \item{y}{The binary response variable (taking values 0 or 1 for absence and
 presence respectively).}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
+
+\item{x.nonclim}{The n by p2 matrix of non-climate covariates.}
 
 \item{constrain.beta}{Should ridge penalty be imposed on the betas (slopes)?}
 

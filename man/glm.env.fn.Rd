@@ -4,8 +4,8 @@
 \alias{glm.env.fn}
 \title{Calculate deviance of plateau envelope via GLM}
 \usage{
-glm.env.fn(pars, y, x.clim, x.nonclim, constrain.beta = FALSE,
-  slope.limit = 7)
+glm.env.fn(pars, y, x.clim, x.nonclim = NULL, x.nonclim.formula = NULL,
+  constrain.beta = FALSE, slope.limit = 7)
 }
 \arguments{
 \item{pars}{The vector of envelope parameters, length 2p+p+2+p(p-1)/2.}
@@ -15,8 +15,11 @@ presence respectively).}
 
 \item{x.clim}{The n by p matrix of climate covariates.}
 
-\item{x.nonclim}{The n by p2 matrix of climate covariates (not yet
-implemented).}
+\item{x.nonclim}{The n by p2 matrix of non-climate covariates (default
+\code{NULL}).}
+
+\item{x.nonclim.formula}{The pre-specified formula if non-climate variables
+are included.}
 
 \item{constrain.beta}{Should a ridge penalty be imposed on the betas
 (slopes)? Takes the form either of: a matrix of dimension p by 2

@@ -7,6 +7,7 @@
 #' @param y The binary response variable (taking values 0 or 1 for absence and
 #' presence respectively).
 #' @param x.clim The n by p matrix of climate covariates.
+#' @param x.nonclim The n by p2 matrix of non-climate covariates.
 #' @param constrain.beta Should ridge penalty be imposed on the betas (slopes)?
 #' @param random Logical flag on whether or not to generate random starting values
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2
@@ -17,7 +18,9 @@
 #' required for \code{glm.env.fn}, and \code{constrain.beta}, also as for
 #' \code{glm.env.fn}.
 #' @export
-generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,pars){
+generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
+    constrain.beta=FALSE,random=FALSE,pars){
+
     x.clim <- as.matrix(x.clim)
     n.x.clim <- ncol(x.clim)
     beta.init <- numeric(2*n.x.clim)
@@ -29,6 +32,7 @@ generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,p
     for(i in 1:n.x.clim){
         gamdata[paste("x",i,sep="")] <- x.clim[,i]
     }
+    gamdata$x.nonclim <- x.nonclim
     x <- seq(0,1,length=len)
     x.plot <- array(NA,dim=c(len^n.x.clim,n.x.clim))
     for(i in 1:n.x.clim){
@@ -37,6 +41,10 @@ generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,p
     newgamdat <- list()
     for(i in 1:n.x.clim){
         newgamdat[[paste("x",i,sep="")]] <- x.plot[,i]
+    }
+    if(!is.null(x.nonclim)){
+        newgamdat$x.nonclim <- matrix(rep(colMeans(x.nonclim),len^n.x.clim),
+            ncol=ncol(x.nonclim),byrow=TRUE)
     }
     newgamdatmat <- array(NA,dim=c(len^n.x.clim,n.x.clim))
     for(i in 1:n.x.clim){
@@ -63,7 +71,13 @@ generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,p
     }
     if(n.x.clim!=1){
         # Try multivariate GAM fit to set starting values for x.clim>=2
-        gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",n.x.clim,",sp=rep(0.01,",n.x.clim,"))",sep="",collapse="")
+        if(is.null(x.nonclim)){
+            gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
+                n.x.clim,",sp=rep(0.01,",n.x.clim,"))",sep="",collapse="")
+        }else{
+            gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
+                n.x.clim,",sp=rep(0.01,",n.x.clim,"))+x.nonclim",sep="",collapse="")
+        }
         gam.formula <- as.formula(gam.formula)
         gamfit3 <- gam(gam.formula,family=binomial,data=gamdata)
         predgam3a <- predict(gamfit3,newdata=newgamdat,type="link")
@@ -93,7 +107,9 @@ generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,p
         # Try univariate fits to set starting values az and beta0
         for(i in 1:n.x.clim){
             # Calling fit.glm.env recursively
+        print("Before glm call in generate.initial.values")
             fitted.envelope.glm <- fit.glm.env(y=y,x.clim=x.clim[,i])
+        print("Before glm call in generate.initial.values")
             if(fitted.envelope.glm$par[1]>beta.init[1+(i-1)*2]){
                 beta.init[1+(i-1)*2] <- fitted.envelope.glm$par[1]
             }
@@ -129,7 +145,11 @@ generate.initial.values <- function(y,x.clim,constrain.beta=FALSE,random=FALSE,p
         }
     }else{ # when n.x.clim==1, use GAM
         #require(mgcv)
-        gam.formula <- as.formula("y~s(x1)")
+        if(is.null(x.nonclim)){
+            gam.formula <- as.formula("y~s(x1)")
+        }else{
+            gam.formula <- as.formula("y~s(x1)+x.nonclim")
+        }
         unigamfit <- gam(gam.formula,family=binomial,data=gamdata)
         plot(unigamfit)
         predunigamfit <- predict(unigamfit,newdata=newgamdat,type="link")

@@ -8,6 +8,7 @@
 #' @param y The binary response variable (taking values 0 or 1 for absence and
 #' presence respectively).
 #' @param x.clim The n by p matrix of climate covariates.
+#' @param x.nonclim The n by p2 matrix of non-climate covariates.
 #' @param initial.pars.input A vector of length 2p+p+2+p(p-1)/2 containing
 #' starting values for each parameter; if missing, the code will suggest
 #' starting values.
@@ -44,10 +45,19 @@
 #' \item{\code{x.clim}}{The climate data, also for the plotting functions.}
 #' }
 #' @export
-fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=100,
-    constrain.beta=FALSE,slope.limit=7){
+fit.glm.env <- function(y,x.clim,x.nonclim=NULL,initial.pars.input,
+    random.search=FALSE,n.iter=100,constrain.beta=FALSE,slope.limit=7){
     x.clim <- as.matrix(x.clim)
     n.x.clim <- ncol(x.clim)
+    if(!is.null(x.nonclim)){
+        x.nonclim <- as.matrix(x.nonclim)
+        x.nonclim.names <- colnames(x.nonclim)
+        x.nonclim.formula <- as.formula(paste("y~offset(x.envelope)-1+",
+            paste(x.nonclim.names,collapse="+"),sep=""))
+
+    }else{
+        x.nonclim.formula <- NULL
+    }
     # Now standardise the climate variables by mapping onto [0,1]
     x.clim.std <- apply(x.clim,2,function(x){
         x.min <- min(x)
@@ -56,7 +66,8 @@ fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=1
     })
     # If no initial values supplied, we'll work out our own
     if(missing(initial.pars.input)){
-        initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,constrain.beta=constrain.beta)
+        initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,
+            x.nonclim=x.nonclim,constrain.beta=constrain.beta)
         initial.pars <- initial.object$initial.pars
         constrain.beta <- initial.object$constrain.beta
     }else{ # If initial values supplied, use those
@@ -64,8 +75,9 @@ fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=1
     }
     # Obtain our first set of estimate parameters from optim()
     fit1 <- optim(par=initial.pars,fn=glm.env.fn,hessian=FALSE,
-        control=list(maxit=10000),y=y,x.clim=x.clim.std,constrain.beta=constrain.beta,
-        slope.limit=slope.limit)
+        control=list(maxit=10000),y=y,x.clim=x.clim.std,x.nonclim=x.nonclim,
+        x.nonclim.formula=x.nonclim.formula,
+        constrain.beta=constrain.beta,slope.limit=slope.limit)
     current.pars <- fit1$par
     current.best <- fit1$value
     current.best.fit <- fit1
@@ -79,6 +91,7 @@ fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=1
                 old.current.best.i <- current.best.i
                 fit1 <- optim(par=current.pars,fn=glm.env.fn,hessian=FALSE,
                     control=list(maxit=10000),y=y,x.clim=x.clim.std,
+                    x.nonclim=x.nonclim,x.nonclim.formula=x.nonclim.formula,
                     constrain.beta=constrain.beta,slope.limit=slope.limit)
                 new.value <- fit1$value
                 if(current.best.i>new.value){
@@ -91,7 +104,10 @@ fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=1
                 current.best.fit <- fit1
                 current.pars <- fit1$par
             }
-            current.pars <- generate.initial.values(y=y,x.clim=x.clim.std,constrain.beta=constrain.beta,random=TRUE,pars=current.best.fit$par)
+            current.pars <- generate.initial.values(y=y,x.clim=x.clim.std,
+                x.nonclim=x.nonclim,
+                constrain.beta=constrain.beta,random=TRUE,
+                pars=current.best.fit$par)
             print("Current parameter values:")
             print(current.pars)
             print("Current best deviance:")
@@ -112,6 +128,7 @@ fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=1
             current.pars <- fit1$par
             fit1 <- optim(par=current.pars,fn=glm.env.fn,hessian=FALSE,
                 control=list(maxit=10000),y=y,x.clim=x.clim.std,
+                x.nonclim=x.nonclim,x.nonclim.formula=x.nonclim.formula,
                 constrain.beta=constrain.beta,slope.limit=slope.limit)
             new.value <- fit1$value
             if(current.best>new.value){
@@ -120,9 +137,19 @@ fit.glm.env <- function(y,x.clim,initial.pars.input,random.search=FALSE,n.iter=1
             }
         }
     }
+    if(!is.null(x.nonclim)){
+        x.envelope <- env.fn(pars=current.best.fit$par,x.clim=x.clim.std,
+            slope.limit=slope.limit)$x.envelope
+        tempdata <- data.frame(y,x.envelope,x.nonclim)
+        current.best.fit$nonclim.glm <- glm(x.nonclim.formula,data=tempdata,
+            family=binomial)
+    }else{
+        current.best.fit$nonclim.glm <- NULL
+    }
     # Add the data, mainly for the plotting functions
     current.best.fit$y <- y
     current.best.fit$x.clim <- x.clim
+    current.best.fit$x.nonclim <- x.nonclim
 
     return(current.best.fit)
 }

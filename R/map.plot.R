@@ -71,15 +71,13 @@ map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
     par(mar=c(1,1,1,1)+0.1)
     if(plot.type=="Prediction"){
         plot(mapproject(x=coordinates$long,y=coordinates$lat,projection='azequalarea'),
-            pch=16,xaxt="n",yaxt="n",col=plot.p,
-            xlab="",ylab="")
+            pch=16,xaxt="n",yaxt="n",col=plot.p,xlab="",ylab="")
         text(-0.226,-0.23,paste(scenario.name,", ",species.name,sep=""),pos=4,cex=2)
         legend(-0.21,-0.25,legend=c("Probability 0.1","Probability 0.5","Probability 0.9"),pch=c(16,16,16),
             col=c(900,500,100))
     }else{
         plot(mapproject(x=coordinates$long,y=coordinates$lat,projection='azequalarea'),
-            pch=15*(inputs)+1,xaxt="n",yaxt="n",col=plot.p,
-            xlab="",ylab="")
+            pch=plot.p,xaxt="n",yaxt="n",xlab="",ylab="")
         text(-0.226,-0.23,species.name,pos=4,cex=2)
         legend(-0.2,-0.25,legend=c("Recorded Presence","Recorded Absence"),pch=c(16,1))
     }

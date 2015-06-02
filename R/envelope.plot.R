@@ -25,7 +25,7 @@
 #' which are "close" to the chosen values of the held out variables, and
 #' empty circles otherwise; the value "plot" is as for shade but without
 #' the empty circles; and for any other value of \code{close.points},
-#' the full data set will be plotted as empty circles.
+#' the full data set will be plotted as filled circles.
 #' @param contour.levels If specified, the probability values to be plotted
 #' in the contour plots; this is especially important when using
 #' \code{plot.envelope} to make a "video".
@@ -129,7 +129,7 @@ envelope.plot <- function(envelope.fit,type="persp",x.plot.lims=c(0,1),len=100,
             }
         }
         if(type=="persp"){
-            op <- par()
+            op <- par(no.readonly = TRUE)
             par(mar=c(1,0,1,0))
             temppersp <- persp(x.plot.seq,x.plot.seq,t(matrix(logityrange.tmp,ncol=len)),
                 theta=20,phi=30,zlim=c(0,1),xlab=x.labels[plot.vars[1]],ylab=x.labels[plot.vars[2]],
@@ -146,12 +146,12 @@ envelope.plot <- function(envelope.fit,type="persp",x.plot.lims=c(0,1),len=100,
                             col=envelope.fit$y+1,pch=16)
                     }else{
                         points(trans3d(x.clim.std[,plot.vars[1]],x.clim.std[,plot.vars[2]],z=1,pmat=temppersp),
-                            col=envelope.fit$y+1)
+                            col=envelope.fit$y+1,pch=16,cex=0.7)
                     }
                 }
             }else{
                 points(trans3d(x.clim.std[,plot.vars[1]],x.clim.std[,plot.vars[2]],z=1,pmat=temppersp),
-                    col=envelope.fit$y+1)
+                    col=envelope.fit$y+1,pch=16,cex=0.7)
             }
             par(op)
         }else{ # type=="contour"
@@ -172,11 +172,11 @@ envelope.plot <- function(envelope.fit,type="persp",x.plot.lims=c(0,1),len=100,
                             pch=1+15*(abs(rowSums(x.clim.std[,x.clim.names.excluded]-matrix(rep(fix.values[x.clim.names.excluded]/len,nrow(x.clim)),ncol=n.x.clim-2,byrow=TRUE)))<0.1),
                             cex=0+(abs(rowSums(x.clim.std[,x.clim.names.excluded]-matrix(rep(fix.values[x.clim.names.excluded]/len,nrow(x.clim)),ncol=n.x.clim-2,byrow=TRUE)))<0.1))
                     }else{
-                        points(x.clim[,plot.vars[1]],x.clim[,plot.vars[2]],col=envelope.fit$y+1)
+                        points(x.clim[,plot.vars[1]],x.clim[,plot.vars[2]],col=envelope.fit$y+1,pch=16,cex=0.7)
                     }
                 }
             }else{
-                points(x.clim[,plot.vars[1]],x.clim[,plot.vars[2]],col=envelope.fit$y+1)
+                points(x.clim[,plot.vars[1]],x.clim[,plot.vars[2]],col=envelope.fit$y+1,pch=16,cex=0.7)
             }
         }
     }

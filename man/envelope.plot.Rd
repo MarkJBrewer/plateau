@@ -38,7 +38,7 @@ perspective plots: the value "shade" plots filled circles for points
 which are "close" to the chosen values of the held out variables, and
 empty circles otherwise; the value "plot" is as for shade but without
 the empty circles; and for any other value of \code{close.points},
-the full data set will be plotted as empty circles.}
+the full data set will be plotted as filled circles.}
 
 \item{contour.levels}{If specified, the probability values to be plotted
 in the contour plots; this is especially important when using

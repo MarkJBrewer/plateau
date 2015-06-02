@@ -67,7 +67,7 @@ map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
         plot.p <- 15*inputs+1
     }
     if(save.PDF){pdf(file.name)}
-    op <- par()
+    op <- par(no.readonly = TRUE)
     par(mar=c(1,1,1,1)+0.1)
     if(plot.type=="Prediction"){
         plot(mapproject(x=coordinates$long,y=coordinates$lat,projection='azequalarea'),

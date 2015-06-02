@@ -2,7 +2,7 @@ Package: plateau
 Title: Fit plateau climate envelopes in species distribution models for presence/absence data
 Version: 0.1.1
 Authors@R: "Mark J Brewer <mark.brewer@bioss.ac.uk> [aut, cre]"
-Description: Fit plateau climate envelopes in species distribution models for presence/absence data
-Depends: R2WinBUGS, mgcv
+Description: Fit plateau climate envelopes in species distribution models for presence/absence data.
+Depends: R2WinBUGS, mgcv, mapproj
 License: GPL-2 | GPL-3
 LazyData: true

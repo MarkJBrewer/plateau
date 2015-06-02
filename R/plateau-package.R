@@ -22,4 +22,7 @@
 #' @references
 #' \url{https://github.com/MarkJBrewer/plateau}
 #' @keywords package
+#' @import R2WinBUGS
+#' @import mgcv
+#' @import mapproj
 NULL

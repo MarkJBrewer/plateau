@@ -60,7 +60,8 @@ map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
             nonlinpart <- 0
         }
         linpred <- x.envelope+nonlinpart
-        plot.p <- 1/(1+exp(linpred))        plot.p <- round(plot.p*1000)
+        plot.p <- 1/(1+exp(linpred))
+        plot.p <- round(plot.p*1000)
         palette(grey(seq(0,1,len=1001)))
     }else{
         plot.p <- 15*inputs+1
@@ -68,7 +69,7 @@ map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
     if(save.PDF){pdf(file.name)}
     op <- par()
     par(mar=c(1,1,1,1)+0.1)
-    plot(mapproject(x=coordinates$long,y=coordinates$lat,proj='azequalarea'),
+    plot(mapproject(x=coordinates$long,y=coordinates$lat,projection='azequalarea'),
         pch=16,xaxt="n",yaxt="n",col=plot.p,
         xlab="",ylab="")
     if(plot.type=="Prediction"){

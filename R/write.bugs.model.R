@@ -8,12 +8,16 @@
 write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
 
     # WinBUGS code as a function
-    #NClique <- car.tau <- nonbeta <- beta0 <- az <- ax.var <- beta0.diff <- beta0.var <- beta0.mu <- N <- NEnv <- 1
-    #u.clique.start <- u.clique.end <- nonsingleton.clique.list <- x.clim.Total <- x.clim.Total.tmp <- ax <- which.beta <- p <- y <- numeric(10)
-    #adj.clique.start <- adj.clique.end <- adj <- clique <- clique.u <- numeric(10)
-    #x.clim <- min.gamma.1 <- min.gamma.2 <- max.gamma.1 <- max.gamma.2 <- array(NA,dim=c(10,10))
-    #min.gamma <- max.gamma <- gamma.temp <- x.clim.CalcCrossColSum <- gamma <- x.clim.Calc <- x.clim.Calc2 <- x.clim.C <- beta <- array(NA,dim=c(10,10))
-    #x.clim.CalcCross <- x.clim.beta <- array(NA,dim=c(10,10,10))
+    NClique <- car.tau <- nonbeta <- beta0 <- az <- ax.var <- beta0.diff <- beta0.var <- beta0.mu <- N <- NEnv <- NnonEnv <- NonSingletonClique <- 1
+    u.clique.start <- u.clique.end <- nonsingleton.clique.list <- x.clim.Total <- x.clim.Total.tmp <- ax <- which.beta <- p <- y <- numeric(2)
+    adj.clique.start <- adj.clique.end <- adj <- clique <- clique.u <- numeric(2)
+    x.clim <- x.nonclim <- min.gamma.1 <- min.gamma.2 <- max.gamma.1 <- max.gamma.2 <- array(NA,dim=c(2,2))
+    min.gamma <- max.gamma <- gamma.temp <- x.clim.CalcCrossColSum <- gamma <- x.clim.Calc <- x.clim.Calc2 <- x.clim.C <- beta <- array(NA,dim=c(2,2))
+    x.clim.CalcCross <- x.clim.beta <- array(NA,dim=c(2,2,2))
+    u <- clique.i <- numeric(2)
+    beta.var <- array(NA,dim=c(2,2))
+    `logit<-` <- function(x){x}
+    
     if(n.x.nonclim==0 && n.x.clim>1.5){
         envmodel <- function(){
             pi <- 3.141592

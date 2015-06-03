@@ -3,10 +3,14 @@
 #' \code{map.plot} plots the fitted maps of "climate suitability" for a given
 #' set of climate variable values. Can also be use to plot maps of the presence/absence data.
 #'
-#' @param inputs If a numeric vector, then it contains the envelope parameters and has length 2p+p+2+p(p-1)/2.
-#' If a logical vector, then it should have length n. The former is used for plotting shaded predictions for
-#' the climate envelope models; the latter is used for making simple presence/absence plots. For presence/absence
-#' plots, \code{x.clim.new} and \code{x.clim} are ignored.
+#' @param inputs A numeric vector. If \code{plot.type} has value "Prediction", then it contains the
+#' envelope parameters and has length 2p+p+2+p(p-1)/2. If \code{plot.type} has value "Presence",
+#' then it should have length n and contain a vector of 0's and 1's (or FALSE and TRUE) marking absence
+#' and presence respectively. The "Prediction" form is used for plotting shaded predictions for
+#' the climate envelope models; the "Presence" form is used for making simple presence/absence plots.
+#' For presence/absence plots, \code{x.clim.new} and \code{x.clim} are ignored.
+#' @param plot.type A string to indicate what kind of map to plot; takes values "Prediction" (the
+#' default) or "Presence". (In fact, any string not identical to "Prediction" will lead to a Presence plot.)
 #' @param x.clim.new A matrix, having the same columns as \code{x.clim}, and
 #' containing the points in climate space at which to evaluate the
 #' envelope and produce predictions in space.
@@ -29,13 +33,8 @@
 #' @return Map of predictions of "climate suitability".
 #' @seealso \code{link{envelope.plot}}
 #' @export
-map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
+map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
     coordinates,species.name="",scenario.name="",save.PDF=FALSE,file.name){
-    plot.type <- "Prediction"
-    if(is.logical(inputs)){
-        plot.type <- "Presences"
-        scenario.name <- "PA"
-    }
     if(save.PDF & missing(file.name)){
         file.name <- paste("Map",species.name,scenario.name,".pdf",sep="")
     }
@@ -64,6 +63,9 @@ map.plot <- function(inputs,x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
         plot.p <- round(plot.p*1000)
         palette(grey(seq(0,1,len=1001)))
     }else{
+        if(scenario.name==""){
+            scenario.name <- "PA"
+        }
         plot.p <- 15*inputs+1
     }
     if(save.PDF){pdf(file.name)}

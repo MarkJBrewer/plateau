@@ -4,15 +4,20 @@
 \alias{map.plot}
 \title{Plot maps showing predictions for a given set of climate data.}
 \usage{
-map.plot(inputs, x.clim.new, x.clim, x.nonclim = NULL, pars.nonclim = NULL,
-  coordinates, species.name = "", scenario.name = "", save.PDF = FALSE,
-  file.name)
+map.plot(inputs, plot.type = "Prediction", x.clim.new, x.clim,
+  x.nonclim = NULL, pars.nonclim = NULL, coordinates, species.name = "",
+  scenario.name = "", save.PDF = FALSE, file.name)
 }
 \arguments{
-\item{inputs}{If a numeric vector, then it contains the envelope parameters and has length 2p+p+2+p(p-1)/2.
-If a logical vector, then it should have length n. The former is used for plotting shaded predictions for
-the climate envelope models; the latter is used for making simple presence/absence plots. For presence/absence
-plots, \code{x.clim.new} and \code{x.clim} are ignored.}
+\item{inputs}{A numeric vector. If \code{plot.type} has value "Prediction", then it contains the
+envelope parameters and has length 2p+p+2+p(p-1)/2. If \code{plot.type} has value "Presence",
+then it should have length n and contain a vector of 0's and 1's (or FALSE and TRUE) marking absence
+and presence respectively. The "Prediction" form is used for plotting shaded predictions for
+the climate envelope models; the "Presence" form is used for making simple presence/absence plots.
+For presence/absence plots, \code{x.clim.new} and \code{x.clim} are ignored.}
+
+\item{plot.type}{A string to indicate what kind of map to plot; takes values "Prediction" (the
+default) or "Presence". (In fact, any string not identical to "Prediction" will lead to a Presence plot.)}
 
 \item{x.clim.new}{A matrix, having the same columns as \code{x.clim}, and
 containing the points in climate space at which to evaluate the

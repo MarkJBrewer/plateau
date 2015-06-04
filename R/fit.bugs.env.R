@@ -226,7 +226,7 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
         WinBUGS.model <- WinBUGS.code
         if(!is.null(WinBUGS.code.location)){
             file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep=""),
-                      paste(working.directory,WinBUGS.code,sep=""))
+                      working.directory)
         }
     }else{
         if(is.null(x.nonclim)){

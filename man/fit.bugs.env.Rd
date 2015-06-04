@@ -10,7 +10,8 @@ fit.bugs.env(y, x.clim, x.nonclim = NULL, car.sigma = 0.1, num, adj, u,
   ax = FALSE), burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
   working.directory = NULL,
   bugs.directory = "C:/Program Files (x86)/WinBUGS14/",
-  WinBUGS.debug = FALSE, WinBUGS.code = NULL, no.starting.value = NULL,
+  WinBUGS.debug = FALSE, WinBUGS.code = NULL,
+  WinBUGS.code.location = NULL, no.starting.value = NULL,
   estimate.p = FALSE, estimate.u = FALSE, u.clique.start, u.clique.end,
   adj.clique.start, adj.clique.end, clique, clique.i)
 }
@@ -97,11 +98,15 @@ default "C:/Program Files (x86)/WinBUGS14/" is for Windows
 running (default \code{FALSE} implies WinBUGS is closed).}
 
 \item{WinBUGS.code}{You can supply your own code file, especially useful if
-you want to use informative priors for external information; the default is
-\code{NULL}, and the code file must be in the same folder as specified by
-\code{working.directory}. The effect of a \code{NULL} value is to select
-either file \code{WinBUGS.txt}, or, in the case of a single climate
-variable, \code{WinBUGS1.txt}.}
+you want to use informative priors for external information. The default
+value is \code{NULL}, and the code file must be in the folder as specified by
+\code{WinBUGS.code.location}. The effect of a \code{NULL} value that the
+function \code{write.bugs.model} is called, and the WinBUGS code file is
+generated automatically.}
+
+\item{WinBUGS.code.location}{If \code{WinBUGS.code} is not \code{NULL} then
+this folder is examined for the code file specified.  The default value is
+\code{NULL}, whereby the code looks for the file in the \code{working.directory}.}
 
 \item{no.starting.value}{A list of strings denoting the objects we should
 not initialise, usually because we set them or calculate them in a bespoke

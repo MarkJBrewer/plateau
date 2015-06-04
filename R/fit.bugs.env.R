@@ -65,11 +65,14 @@
 #' @param WinBUGS.debug Logical flag as to whether to close WinBUGS after
 #' running (default \code{FALSE} implies WinBUGS is closed).
 #' @param WinBUGS.code You can supply your own code file, especially useful if
-#' you want to use informative priors for external information; the default is
-#' \code{NULL}, and the code file must be in the same folder as specified by
-#' \code{working.directory}. The effect of a \code{NULL} value is to select
-#' either file \code{WinBUGS.txt}, or, in the case of a single climate
-#' variable, \code{WinBUGS1.txt}.
+#' you want to use informative priors for external information. The default
+#' value is \code{NULL}, and the code file must be in the folder as specified by
+#' \code{WinBUGS.code.location}. The effect of a \code{NULL} value that the
+#' function \code{write.bugs.model} is called, and the WinBUGS code file is
+#' generated automatically.
+#' @param WinBUGS.code.location If \code{WinBUGS.code} is not \code{NULL} then
+#' this folder is examined for the code file specified.  The default value is
+#' \code{NULL}, whereby the code looks for the file in the \code{working.directory}.
 #' @param no.starting.value A list of strings denoting the objects we should
 #' not initialise, usually because we set them or calculate them in a bespoke
 #' WinBUGS code file. These objects will be set to \code{NA} by this function;
@@ -148,8 +151,8 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     burnin=5000,post.burnin=1000,chains=2,thin=1,
     working.directory=NULL,
     bugs.directory="C:/Program Files (x86)/WinBUGS14/",
-    WinBUGS.debug=FALSE,WinBUGS.code=NULL,no.starting.value=NULL,
-    estimate.p=FALSE,estimate.u=FALSE,
+    WinBUGS.debug=FALSE,WinBUGS.code=NULL,WinBUGS.code.location=NULL,
+    no.starting.value=NULL,estimate.p=FALSE,estimate.u=FALSE,
     u.clique.start,u.clique.end,adj.clique.start,adj.clique.end,clique,clique.i){
 
     #plateau.package.directory <- paste(path.package("plateau"),"/models/",sep="")
@@ -221,17 +224,16 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     }
     if(!is.null(WinBUGS.code)){
         WinBUGS.model <- WinBUGS.code
+        if(!is.null(WinBUGS.code.location)){
+            file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep=""),
+                      paste(working.directory,WinBUGS.code,sep=""))
+        }
     }else{
         if(is.null(x.nonclim)){
             WinBUGS.model <- write.bugs.model(n.x.clim)
         }else{
             WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim))
         }
-#         if(n.x.clim==1){
-#             WinBUGS.model <- paste(plateau.package.directory,"WinBUGS1.txt",sep="")
-#         }else{
-#             WinBUGS.model <- paste(plateau.package.directory,"WinBUGS.txt",sep="")
-#         }
     }
     if(missing(constrain.beta)){
         constrain.beta <- matrix(rep(FALSE,2*n.x.clim),ncol=2)

@@ -54,10 +54,9 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
             az ~ dnorm(0,0.1)
             beta0 <- az - exp(beta0.diff)
             for(i in 1:NonSingletonClique){
-                clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]]-u.clique.start[nonsingleton.clique.list[i]]+1
-        	   u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~
-        car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:clique.length[nonsingleton.clique.list[i]]],
-        num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
+              clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]] - u.clique.start[nonsingleton.clique.list[i]] + 1
+              adj.clique.length[nonsingleton.clique.list[i]] <- adj.clique.end[nonsingleton.clique.list[i]] - adj.clique.start[nonsingleton.clique.list[i]] + 1
+              u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:adj.clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
             }
             for(k in 1:adj.clique.end[NClique]) {
         	   weights[k] <- 1
@@ -115,9 +114,9 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
             az ~ dnorm(0,0.1)
             beta0 <- az - exp(beta0.diff)
             for(i in 1:NonSingletonClique){
-                clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]]-u.clique.start[nonsingleton.clique.list[i]]+1
-                u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
-            }
+              clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]] - u.clique.start[nonsingleton.clique.list[i]] + 1
+              adj.clique.length[nonsingleton.clique.list[i]] <- adj.clique.end[nonsingleton.clique.list[i]] - adj.clique.start[nonsingleton.clique.list[i]] + 1
+              u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:adj.clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)            }
             for(k in 1:adj.clique.end[NClique]) {
                 weights[k] <- 1
             }
@@ -172,8 +171,9 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
             az ~ dnorm(0,0.1)
             beta0 <- az - exp(beta0.diff)
             for(i in 1:NonSingletonClique){
-                clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]]-u.clique.start[nonsingleton.clique.list[i]]+1
-                u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:clique.length[nonsingleton.clique.list[i]]],num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
+              clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]] - u.clique.start[nonsingleton.clique.list[i]] + 1
+              adj.clique.length[nonsingleton.clique.list[i]] <- adj.clique.end[nonsingleton.clique.list[i]] - adj.clique.start[nonsingleton.clique.list[i]] + 1
+              u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:adj.clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
             }
             for(k in 1:adj.clique.end[NClique]) {
         	   weights[k] <- 1
@@ -238,8 +238,9 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0){
             az ~ dnorm(0,0.1)
             beta0 <- az - exp(beta0.diff)
             for(i in 1:NonSingletonClique){
-                clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]]-u.clique.start[nonsingleton.clique.list[i]]+1
-                u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
+              clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]] - u.clique.start[nonsingleton.clique.list[i]] + 1
+              adj.clique.length[nonsingleton.clique.list[i]] <- adj.clique.end[nonsingleton.clique.list[i]] - adj.clique.start[nonsingleton.clique.list[i]] + 1
+              u[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]] ~ car.normal(adj[adj.clique.start[nonsingleton.clique.list[i]]:adj.clique.end[nonsingleton.clique.list[i]]], weights[1:adj.clique.length[nonsingleton.clique.list[i]]], num[u.clique.start[nonsingleton.clique.list[i]]:u.clique.end[nonsingleton.clique.list[i]]], tau)
             }
             for(k in 1:adj.clique.end[NClique]) {
                 weights[k] <- 1

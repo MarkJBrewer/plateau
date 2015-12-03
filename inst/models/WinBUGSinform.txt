@@ -52,14 +52,14 @@ for(e in 1:1){
 	beta[e,2] ~ dnorm(beta.mu[e,2],beta.prec[e,2])I(0,)
 }
 
-yp <- log(0.05/0.95)
+yp <- log(0.02/0.98)
 for(e in 2:2){
 	ax.prec[e] <- 1/ax.var[e]
 	ax[e] ~ dnorm(ax.mu[e],ax.prec[e])I(-1,2)
 	beta.prec[e,1] <- 1/beta.var[e,1]
 	beta.prec[e,2] <- 1/beta.var[e,2]
 	beta[e,1] ~ dnorm(beta.mu[e,1],beta.prec[e,1])I(0,)
-	beta[e,2] <- ((az-yp)/(1.171017-ax[e]))*((az-yp)/(1.171017-ax[e]))
+	beta[e,2] <- ((az-yp)/(1.032821-ax[e]))*((az-yp)/(1.032821-ax[e]))
 }
 
 for(e1 in 1:(NEnv-1)){

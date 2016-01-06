@@ -70,7 +70,7 @@
 #' generated automatically.
 #' @param WinBUGS.code.location If \code{WinBUGS.code} is not \code{NULL} then
 #' this folder is examined for the code file specified.  The default value is
-#' \code{NULL}, whereby the code looks for the file in the \code{working.directory}.
+#' \code{NULL}, whereby the code looks for the file in the current directory.
 #' @param no.starting.value A list of strings denoting the objects we should
 #' not initialise, usually because we set them or calculate them in a bespoke
 #' WinBUGS code file. These objects will be set to \code{NA} by this function;
@@ -223,6 +223,10 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
         WinBUGS.model <- WinBUGS.code
         if(!is.null(WinBUGS.code.location)){
             file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
+                      working.directory)
+        }else{
+            print(getwd())
+            file.copy(paste(savedWD,WinBUGS.code,sep="/"),
                       working.directory)
         }
     }else{

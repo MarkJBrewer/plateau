@@ -104,7 +104,7 @@ generated automatically.}
 
 \item{WinBUGS.code.location}{If \code{WinBUGS.code} is not \code{NULL} then
 this folder is examined for the code file specified.  The default value is
-\code{NULL}, whereby the code looks for the file in the \code{working.directory}.}
+\code{NULL}, whereby the code looks for the file in the current directory.}
 
 \item{no.starting.value}{A list of strings denoting the objects we should
 not initialise, usually because we set them or calculate them in a bespoke

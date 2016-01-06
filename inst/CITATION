@@ -8,13 +8,13 @@ citEntry(entry       = "article",
       person(given="B.J.", family="Anderson"),
 			person(given="R.", family="Ohlemueller")),
 	journal      = "Methods in Ecology and Evolution (hopefully)",
-	year         = 2015,
+	year         = 2016,
 	pages        = "1--2",
 	number       = 1,
   volume       = 1,
 	url          = "",
-	textVersion  = paste("Brewer, M.J., O'Hara, R.B., Anderson, B.J. and Ohlemueller, R. (2015).",
+	textVersion  = paste("Brewer, M.J., O'Hara, R.B., Anderson, B.J. and Ohlemueller, R. (2016).",
 		"Climate Envelopes for Species Distribution Models",
-		"Methods in Ecology and Evolution (possibly submitted)")
+		"Methods in Ecology and Evolution (submitted)")
 	)
 

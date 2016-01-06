@@ -55,10 +55,8 @@
 #' be retained (default 1000).
 #' @param chains Scalar, number of parallel chains to run (default 2).
 #' @param thin Scalar, the thinning to apply to the MCMC iterations (default 1).
-#' @param working.directory String containing the location of the WinBUGS files
-#' WinBUGS.txt, WinBUGS1.txt and WinBUGSinform.txt, default
-#' NULL.
-##' "C:/Program Files (x86)/WinBUGS14/".
+#' @param working.directory String containing the location of the WinBUGS code
+#' file; default NULL, in which case a temporary folder is used.
 #' @param bugs.directory String containing location of WinBUGS installation;
 #' default "C:/Program Files (x86)/WinBUGS14/" is for Windows
 #' 64-bit machines.
@@ -155,7 +153,6 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     no.starting.value=NULL,estimate.p=FALSE,estimate.u=FALSE,
     u.clique.start,u.clique.end,adj.clique.start,adj.clique.end,clique,clique.i){
 
-    #plateau.package.directory <- paste(path.package("plateau"),"/models/",sep="")
     # Move to working directory or temporary directory when NULL
     inTempDir <- FALSE
     if(is.null(working.directory)) {
@@ -225,7 +222,7 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     if(!is.null(WinBUGS.code)){
         WinBUGS.model <- WinBUGS.code
         if(!is.null(WinBUGS.code.location)){
-            file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep=""),
+            file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
                       working.directory)
         }
     }else{

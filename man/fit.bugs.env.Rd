@@ -85,10 +85,8 @@ be retained (default 1000).}
 
 \item{thin}{Scalar, the thinning to apply to the MCMC iterations (default 1).}
 
-\item{working.directory}{String containing the location of the WinBUGS files
-WinBUGS.txt, WinBUGS1.txt and WinBUGSinform.txt, default
-NULL.
-"C:/Program Files (x86)/WinBUGS14/".}
+\item{working.directory}{String containing the location of the WinBUGS code
+file; default NULL, in which case a temporary folder is used.}
 
 \item{bugs.directory}{String containing location of WinBUGS installation;
 default "C:/Program Files (x86)/WinBUGS14/" is for Windows

@@ -6,7 +6,7 @@
 #' \tabular{ll}{
 #' Package: \tab plateau\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.1.1\cr
+#' Version: \tab 0.1.2\cr
 #' Date: \tab 2014-12-18\cr
 #' License: \tab GPL (>= 2)\cr
 #' LazyLoad: \tab yes\cr

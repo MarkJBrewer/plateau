@@ -6,8 +6,8 @@
 #' \tabular{ll}{
 #' Package: \tab plateau\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.1.2\cr
-#' Date: \tab 2014-12-18\cr
+#' Version: \tab 0.2.0\cr
+#' Date: \tab 2016-06-17\cr
 #' License: \tab GPL (>= 2)\cr
 #' LazyLoad: \tab yes\cr
 #' }
@@ -25,4 +25,7 @@
 #' @import R2WinBUGS
 #' @import mgcv
 #' @import mapproj
+#' @importFrom grDevices dev.off grey palette pdf trans3d
+#' @importFrom graphics contour legend persp par plot points text
+#' @importFrom stats as.formula binomial coef cor glm lm optim predict rnorm runif
 NULL

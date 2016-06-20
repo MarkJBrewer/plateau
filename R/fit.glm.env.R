@@ -26,6 +26,8 @@
 #' betas should be constrained.
 #' @param slope.limit Scalar putting an upper bound on the envelope slopes;
 #' limit is approximately \code{exp(slope.limit)}.
+#' @param silent Logical flag denoting whether the function runs silently or
+#' not. Default is \code{TRUE}.
 #' @return A list containing the following elements:
 #' \describe{
 #' \item{\code{par}}{Vector of estimates of the parameters in the order: (2*p) *log*
@@ -46,7 +48,8 @@
 #' }
 #' @export
 fit.glm.env <- function(y,x.clim,x.nonclim=NULL,initial.pars.input,
-    random.search=FALSE,n.iter=100,constrain.beta=FALSE,slope.limit=7){
+    random.search=FALSE,n.iter=100,constrain.beta=FALSE,slope.limit=7,
+    silent=TRUE){
     x.clim <- as.matrix(x.clim)
     n.x.clim <- ncol(x.clim)
     if(!is.null(x.nonclim)){
@@ -108,14 +111,16 @@ fit.glm.env <- function(y,x.clim,x.nonclim=NULL,initial.pars.input,
                 x.nonclim=x.nonclim,
                 constrain.beta=constrain.beta,random=TRUE,
                 pars=current.best.fit$par)
-            print("Current parameter values:")
-            print(current.pars)
-            print("Current best deviance:")
-            print(current.best)
-            if(i==1){
-                cat(paste(i," iteration of ",n.iter,".\n",sep=""))
-            }else{
-                cat(paste(i," iterations of ",n.iter,".\n",sep=""))
+            if(!silent){
+                print("Current parameter values:")
+                print(current.pars)
+                print("Current best deviance:")
+                print(current.best)
+                if(i==1){
+                    cat(paste(i," iteration of ",n.iter,".\n",sep=""))
+                }else{
+                    cat(paste(i," iterations of ",n.iter,".\n",sep=""))
+                }
             }
         }
     }else{

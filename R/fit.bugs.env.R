@@ -85,6 +85,8 @@
 #' for the spatial random effects of presence for each cell,
 #' default \code{FALSE}; be aware using \code{TRUE} can result in slow
 #' interaction between R and WinBUGS.
+#' @param silent Logical flag denoting whether the function runs silently or
+#' not. Default is \code{TRUE}.
 #'
 #' The final inputs are optional and will be ignored otherwise. Specifically,
 #' you have the option of setting up more than one \code{car.normal} in case you
@@ -147,7 +149,7 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     prior.ax,prior.beta,prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
     burnin=5000,post.burnin=1000,chains=2,thin=1,
-    working.directory=NULL,
+    working.directory=NULL,silent=TRUE,
     bugs.directory="C:/Program Files (x86)/WinBUGS14/",
     WinBUGS.debug=FALSE,WinBUGS.code=NULL,WinBUGS.code.location=NULL,
     no.starting.value=NULL,estimate.p=FALSE,estimate.u=FALSE,
@@ -225,7 +227,9 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
             file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
                       working.directory)
         }else{
-            print(getwd())
+            if(!silent){
+                print(getwd())
+            }
             file.copy(paste(savedWD,WinBUGS.code,sep="/"),
                       working.directory)
         }
@@ -462,8 +466,10 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
                     ax=ax.vec*runif(length(ax.vec),0.9,1.1),az=az*runif(1,0.9,1.1))
             }
         }
-        print(paste("Initial values for chain",i,":"))
-        print(WinBUGS.inits[[i]])
+        if(!silent){
+            print(paste("Initial values for chain",i,":"))
+            print(WinBUGS.inits[[i]])
+        }
         WinBUGS.inits[[i]]$u <- u.inits
         if(!is.null(no.starting.value)){
             for(j in 1:length(no.starting.value)){
@@ -474,16 +480,22 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     # Which is the good one? Choose either if both, but ensure large variance above
     which.beta <- rep(2,n.x.clim)
     which.beta[rowSums(constrain.beta)!=0] <- 1
-    print(which.beta)
+    if(!silent){
+        print(which.beta)
+    }
     WinBUGS.data$which.beta <- which.beta
 
     #require(R2WinBUGS)
-    cat("Starting WinBUGS run - opening WinBUGS now...\n")
+    if(!silent){
+        cat("Starting WinBUGS run - opening WinBUGS now...\n")
+    }
     results <- bugs(WinBUGS.data,WinBUGS.inits,WinBUGS.monitor,WinBUGS.model,
         chains,post.burnin+burnin,burnin,thin,
         bugs.directory=bugs.directory,
         working.directory=working.directory,codaPkg=FALSE,debug=WinBUGS.debug,DIC=FALSE)
-    cat("WinBUGS run completed.\n")
+    if(!silent){
+        cat("WinBUGS run completed.\n")
+    }  
     parvec <- c(log(t(results$mean$beta)),results$mean$ax,log(results$mean$az-results$mean$beta0),results$mean$az)
     beta.mat <- results$mean$beta
     if(n.x.clim!=1){

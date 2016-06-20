@@ -11,6 +11,8 @@
 #' @param constrain.beta Should ridge penalty be imposed on the betas (slopes)?
 #' @param random Logical flag on whether or not to generate random starting values
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2
+#' @param silent Logical flag denoting whether the function runs silently or
+#' not. Default is \code{TRUE}.
 #' @return If \code{random==TRUE}, the output will be a single vector of
 #' parameter values in the order required for \code{glm.env.fn}; if
 #' \code{random==FALSE}, the output will be a list with two elements:
@@ -19,7 +21,7 @@
 #' \code{glm.env.fn}.
 #' @export
 generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
-    constrain.beta=FALSE,random=FALSE,pars){
+    constrain.beta=FALSE,random=FALSE,pars,silent=TRUE){
 
     x.clim <- as.matrix(x.clim)
     n.x.clim <- ncol(x.clim)
@@ -107,9 +109,7 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
         # Try univariate fits to set starting values az and beta0
         for(i in 1:n.x.clim){
             # Calling fit.glm.env recursively
-        print("Before glm call in generate.initial.values")
             fitted.envelope.glm <- fit.glm.env(y=y,x.clim=x.clim[,i])
-        print("Before glm call in generate.initial.values")
             if(fitted.envelope.glm$par[1]>beta.init[1+(i-1)*2]){
                 beta.init[1+(i-1)*2] <- fitted.envelope.glm$par[1]
             }
@@ -182,9 +182,11 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
     initial.pars.and.constraints <- list()
     initial.pars.and.constraints$initial.pars <- initial.pars
     initial.pars.and.constraints$constrain.beta <- constrain.beta
-    print("Initial values selected :")
-    print(initial.pars)
-    print("Constrain beta? :")
-    print(constrain.beta)
+    if(!silent){
+        print("Initial values selected :")
+        print(initial.pars)
+        print("Constrain beta? :")
+        print(constrain.beta)
+    }
     return(initial.pars.and.constraints)
 }

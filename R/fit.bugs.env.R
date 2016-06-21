@@ -5,8 +5,14 @@
 #'
 #' @param y The binary response variable (taking values 0 or 1 for absence and
 #' presence respectively).
-#' @param x.clim The n by p matrix of climate covariates.
-#' @param x.nonclim The n by p2 matrix of climate covariates.
+#' @param x.clim The n by p matrix of climate covariates. These covariates
+#' will be fitted using the climate envelope methodology.
+#' @param x.nonclim The n by p2 matrix of non-climate covariates. These covariates
+#' will be fitted as ordinary linear terms. However, more flexible models can
+#' be fitted if bases are supplied (e.g. columns from \code{poly} to fit polynomials,
+#' or from spline basis functions such as \code{bs} or \code{ns} to fit simple Generalised
+#' Additive Models).
+#' @param x.factor The n by p3 matrix of non-climate factors.
 #' @param car.sigma Standard deviation of the WinBUGS \code{car.normal}
 #' process; needs to be a constant in the case of a binary response.
 #' @param num A vector (length n) of the numbers of neighbours of each cell, in
@@ -42,7 +48,8 @@
 #' betas should be constrained.
 #' @param initial.pars.input Vector of length 2p+p+2+p(p-1)/2 containing
 #' starting values for each parameter; if missing, the code
-#' works out its own starting value.
+#' works out its own starting value. If \code{x.factor} is non-null, there will be a total of
+#' the number of total levels across all the factors minus p3 extra parameters.
 #' @param informative.priors List of logical scalars for which informative
 #' priors should be used (from: beta, beta0, ax);
 #' this option uses the \code{function generate.initial.values} to
@@ -145,7 +152,8 @@
 #'                    formula for a cone.}
 #' }
 #' @export
-fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
+fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
+    car.sigma=0.1,num,adj,u,
     prior.ax,prior.beta,prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
     burnin=5000,post.burnin=1000,chains=2,thin=1,
@@ -211,10 +219,10 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     if(missing(initial.pars.input)){
         if(missing(constrain.beta)){
             initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,
-                x.nonclim=x.nonclim)
+                x.nonclim=x.nonclim,x.factor=x.factor)
         }else{
             initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,
-                x.nonclim=x.nonclim,constrain.beta=constrain.beta)
+                x.nonclim=x.nonclim,x.factor=x.factor,constrain.beta=constrain.beta)
         }
         initial.pars <- initial.object$initial.pars
         constrain.beta <- initial.object$constrain.beta
@@ -235,9 +243,17 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
         }
     }else{
         if(is.null(x.nonclim)){
-            WinBUGS.model <- write.bugs.model(n.x.clim)
+            if(is.null(x.factor)){
+                WinBUGS.model <- write.bugs.model(n.x.clim)
+            }else{
+                WinBUGS.model <- write.bugs.model(n.x.clim,0,ncol(x.factor))
+            }
         }else{
-            WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim))
+            if(is.null(x.factor)){
+                WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim))
+            }else{
+                WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim),ncol(x.factor))
+            }
         }
     }
     if(missing(constrain.beta)){
@@ -358,6 +374,16 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
         WinBUGS.data$x.nonclim <- as.matrix(x.nonclim)
         WinBUGS.data$NnonEnv <- ncol(x.nonclim)
         WinBUGS.monitor <- c(WinBUGS.monitor,"nonbeta")
+    }
+    if(!is.null(x.factor)){
+        WinBUGS.data$x.factor <- as.matrix(x.factor)
+        WinBUGS.data$x.factor.lengths <- numeric(ncol(WinBUGS.data$x.factor))
+        for(i in 1:ncol(WinBUGS.data$x.factor)){
+            WinBUGS.data$x.factor.lengths[i] <- nlevels(x.factor[,i])
+            WinBUGS.data$x.factor[,i] <- as.numeric(x.factor[,i])
+        }
+        WinBUGS.data$Nfac <- ncol(WinBUGS.data$x.factor)
+        WinBUGS.monitor <- c(WinBUGS.monitor,"nonfac")
     }
     WinBUGS.inits <- list()
     n.data <- length(y)
@@ -529,6 +555,7 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,car.sigma=0.1,num,adj,u,
     results$y <- y
     results$x.clim <- x.clim
     results$x.nonclim <- x.nonclim
+    results$x.factor <- x.factor
     results$which.beta <- which.beta
 
     return(results)

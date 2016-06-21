@@ -4,7 +4,7 @@
 \alias{write.bugs.model}
 \title{Write WinBUGS code to a temporary file}
 \usage{
-write.bugs.model(n.x.clim, n.x.nonclim = 0)
+write.bugs.model(n.x.clim, n.x.nonclim = 0, n.x.factor = 0)
 }
 \arguments{
 \item{n.x.clim}{The number of climate covariates (n); needed as the WinBUGS
@@ -12,6 +12,9 @@ code is slightly different for n=1.}
 
 \item{n.x.nonclim}{The number of non-climate covariates; needed to know
 whether or not to include a separate loop for such covariates.}
+
+\item{n.x.factor}{The number of non-climate factors; needed to know
+whether or not to include a separate loop for such factors}
 }
 \description{
 Write WinBUGS code to a temporary file

@@ -4,11 +4,11 @@
 \alias{fit.bugs.env}
 \title{Fit a spatial, Bayesian, plateau envelope model via MCMC in WinBUGS}
 \usage{
-fit.bugs.env(y, x.clim, x.nonclim = NULL, car.sigma = 0.1, num, adj, u,
-  prior.ax, prior.beta, prior.beta0.difference, constrain.beta,
-  initial.pars.input, informative.priors = list(beta = FALSE, beta0 = FALSE,
-  ax = FALSE), burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
-  working.directory = NULL,
+fit.bugs.env(y, x.clim, x.nonclim = NULL, x.factor = NULL,
+  car.sigma = 0.1, num, adj, u, prior.ax, prior.beta, prior.beta0.difference,
+  constrain.beta, initial.pars.input, informative.priors = list(beta = FALSE,
+  beta0 = FALSE, ax = FALSE), burnin = 5000, post.burnin = 1000,
+  chains = 2, thin = 1, working.directory = NULL, silent = TRUE,
   bugs.directory = "C:/Program Files (x86)/WinBUGS14/",
   WinBUGS.debug = FALSE, WinBUGS.code = NULL,
   WinBUGS.code.location = NULL, no.starting.value = NULL,
@@ -19,9 +19,16 @@ fit.bugs.env(y, x.clim, x.nonclim = NULL, car.sigma = 0.1, num, adj, u,
 \item{y}{The binary response variable (taking values 0 or 1 for absence and
 presence respectively).}
 
-\item{x.clim}{The n by p matrix of climate covariates.}
+\item{x.clim}{The n by p matrix of climate covariates. These covariates
+will be fitted using the climate envelope methodology.}
 
-\item{x.nonclim}{The n by p2 matrix of climate covariates.}
+\item{x.nonclim}{The n by p2 matrix of non-climate covariates. These covariates
+will be fitted as ordinary linear terms. However, more flexible models can
+be fitted if bases are supplied (e.g. columns from \code{poly} to fit polynomials,
+or from spline basis functions such as \code{bs} or \code{ns} to fit simple Generalised
+Additive Models).}
+
+\item{x.factor}{The n by p3 matrix of non-climate factors.}
 
 \item{car.sigma}{Standard deviation of the WinBUGS \code{car.normal}
 process; needs to be a constant in the case of a binary response.}
@@ -66,7 +73,8 @@ betas should be constrained.}
 
 \item{initial.pars.input}{Vector of length 2p+p+2+p(p-1)/2 containing
 starting values for each parameter; if missing, the code
-works out its own starting value.}
+works out its own starting value. If \code{x.factor} is non-null, there will be a total of
+the number of total levels across all the factors minus p3 extra parameters.}
 
 \item{informative.priors}{List of logical scalars for which informative
 priors should be used (from: beta, beta0, ax);
@@ -87,6 +95,23 @@ be retained (default 1000).}
 
 \item{working.directory}{String containing the location of the WinBUGS code
 file; default NULL, in which case a temporary folder is used.}
+
+\item{silent}{Logical flag denoting whether the function runs silently or
+not. Default is \code{TRUE}.
+
+The final inputs are optional and will be ignored otherwise. Specifically,
+you have the option of setting up more than one \code{car.normal} in case you
+have disconnected subsets of your neighbourhood structure. The vectors
+\code{num}, \code{adj} and \code{u} are still used, and are then composed of
+\code{NClique} parts; the start/end vectors
+below are used to draw out the relevant data for each clique. Note that if
+using separate cliques, \code{num} will have length n as before, but the
+order of corresponding cells will be different (not just 1 to n); instead,
+\code{num} specifies the numbers of neighbours in each cell in clique 1 (in
+the same order as in the data set), and then the numbers of neighbours of
+cells in clique 2, and so on, until the final clique. Vectors \code{adj}
+and \code{u} are structured similarly. The start and end points of each
+clique are specified using the following inputs:}
 
 \item{bugs.directory}{String containing location of WinBUGS installation;
 default "C:/Program Files (x86)/WinBUGS14/" is for Windows
@@ -121,21 +146,7 @@ interaction between R and WinBUGS.}
 \item{estimate.u}{Logical flag specifying whether or not to retain samples
 for the spatial random effects of presence for each cell,
 default \code{FALSE}; be aware using \code{TRUE} can result in slow
-interaction between R and WinBUGS.
-
-The final inputs are optional and will be ignored otherwise. Specifically,
-you have the option of setting up more than one \code{car.normal} in case you
-have disconnected subsets of your neighbourhood structure. The vectors
-\code{num}, \code{adj} and \code{u} are still used, and are then composed of
-\code{NClique} parts; the start/end vectors
-below are used to draw out the relevant data for each clique. Note that if
-using separate cliques, \code{num} will have length n as before, but the
-order of corresponding cells will be different (not just 1 to n); instead,
-\code{num} specifies the numbers of neighbours in each cell in clique 1 (in
-the same order as in the data set), and then the numbers of neighbours of
-cells in clique 2, and so on, until the final clique. Vectors \code{adj}
-and \code{u} are structured similarly. The start and end points of each
-clique are specified using the following inputs:}
+interaction between R and WinBUGS.}
 
 \item{u.clique.start}{Vector of length \code{NClique}; where each clique
 starts in \code{u} (and \code{num}) [Note \code{NClique} is determined in

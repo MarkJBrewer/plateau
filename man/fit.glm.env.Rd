@@ -4,9 +4,9 @@
 \alias{fit.glm.env}
 \title{Fit a plateau envelope via a (non-spatial) GLM and non-linear optimisation}
 \usage{
-fit.glm.env(y, x.clim, x.nonclim = NULL, initial.pars.input,
-  random.search = FALSE, n.iter = 100, constrain.beta = FALSE,
-  slope.limit = 7)
+fit.glm.env(y, x.clim, x.nonclim = NULL, x.factor = NULL,
+  initial.pars.input, random.search = FALSE, n.iter = 100,
+  constrain.beta = FALSE, slope.limit = 7, silent = TRUE)
 }
 \arguments{
 \item{y}{The binary response variable (taking values 0 or 1 for absence and
@@ -16,9 +16,12 @@ presence respectively).}
 
 \item{x.nonclim}{The n by p2 matrix of non-climate covariates.}
 
+\item{x.factor}{The n by p3 matrix of non-climate factors.}
+
 \item{initial.pars.input}{A vector of length 2p+p+2+p(p-1)/2 containing
 starting values for each parameter; if missing, the code will suggest
-starting values.}
+starting values. If \code{x.factor} is non-null, there will be a total of
+the number of total levels across all the factors minus p3 extra parameters.}
 
 \item{random.search}{A logical variable, which when set to \code{TRUE}
 will cause the generation of \code{n.iter} random sets of starting values.}
@@ -37,6 +40,9 @@ betas should be constrained.}
 
 \item{slope.limit}{Scalar putting an upper bound on the envelope slopes;
 limit is approximately \code{exp(slope.limit)}.}
+
+\item{silent}{Logical flag denoting whether the function runs silently or
+not. Default is \code{TRUE}.}
 }
 \value{
 A list containing the following elements:

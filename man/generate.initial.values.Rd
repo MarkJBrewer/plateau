@@ -4,8 +4,8 @@
 \alias{generate.initial.values}
 \title{Generate initial values for plateau envelopes}
 \usage{
-generate.initial.values(y, x.clim, x.nonclim = NULL, constrain.beta = FALSE,
-  random = FALSE, pars)
+generate.initial.values(y, x.clim, x.nonclim = NULL, x.factor = NULL,
+  constrain.beta = FALSE, random = FALSE, pars, silent = TRUE)
 }
 \arguments{
 \item{y}{The binary response variable (taking values 0 or 1 for absence and
@@ -15,11 +15,16 @@ presence respectively).}
 
 \item{x.nonclim}{The n by p2 matrix of non-climate covariates.}
 
+\item{x.factor}{The n by p3 matrix of non-climate factors.}
+
 \item{constrain.beta}{Should ridge penalty be imposed on the betas (slopes)?}
 
 \item{random}{Logical flag on whether or not to generate random starting values}
 
 \item{pars}{The vector of envelope parameters, length 2p+p+2+p(p-1)/2}
+
+\item{silent}{Logical flag denoting whether the function runs silently or
+not. Default is \code{TRUE}.}
 }
 \value{
 If \code{random==TRUE}, the output will be a single vector of

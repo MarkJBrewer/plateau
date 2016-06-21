@@ -8,6 +8,7 @@
 #' presence respectively).
 #' @param x.clim The n by p matrix of climate covariates.
 #' @param x.nonclim The n by p2 matrix of non-climate covariates.
+#' @param x.factor The n by p3 matrix of non-climate factors.
 #' @param constrain.beta Should ridge penalty be imposed on the betas (slopes)?
 #' @param random Logical flag on whether or not to generate random starting values
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2
@@ -20,7 +21,7 @@
 #' required for \code{glm.env.fn}, and \code{constrain.beta}, also as for
 #' \code{glm.env.fn}.
 #' @export
-generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
+generate.initial.values <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
     constrain.beta=FALSE,random=FALSE,pars,silent=TRUE){
 
     x.clim <- as.matrix(x.clim)
@@ -35,6 +36,7 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
         gamdata[paste("x",i,sep="")] <- x.clim[,i]
     }
     gamdata$x.nonclim <- x.nonclim
+    gamdata$x.factor <- x.factor
     x <- seq(0,1,length=len)
     x.plot <- array(NA,dim=c(len^n.x.clim,n.x.clim))
     for(i in 1:n.x.clim){
@@ -47,6 +49,10 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
     if(!is.null(x.nonclim)){
         newgamdat$x.nonclim <- matrix(rep(colMeans(x.nonclim),len^n.x.clim),
             ncol=ncol(x.nonclim),byrow=TRUE)
+    }
+    if(!is.null(x.factor)){
+        newgamdat$x.factor <- matrix(rep(x.factor[1,],len^n.x.clim),
+            ncol=ncol(x.factor),byrow=TRUE)
     }
     newgamdatmat <- array(NA,dim=c(len^n.x.clim,n.x.clim))
     for(i in 1:n.x.clim){
@@ -74,11 +80,21 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
     if(n.x.clim!=1){
         # Try multivariate GAM fit to set starting values for x.clim>=2
         if(is.null(x.nonclim)){
-            gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
-                n.x.clim,",sp=rep(0.01,",n.x.clim,"))",sep="",collapse="")
+            if(is.null(x.factor)){
+                gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
+                    n.x.clim,",sp=rep(0.01,",n.x.clim,"))",sep="",collapse="")
+            }else{
+                gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
+                    n.x.clim,",sp=rep(0.01,",n.x.clim,"))+x.factor",sep="",collapse="")
+            }
         }else{
-            gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
-                n.x.clim,",sp=rep(0.01,",n.x.clim,"))+x.nonclim",sep="",collapse="")
+            if(is.null(x.factor)){
+                gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
+                    n.x.clim,",sp=rep(0.01,",n.x.clim,"))+x.nonclim",sep="",collapse="")
+            }else{
+                gam.formula <- paste("y~te(",paste("x",1:(n.x.clim-1),",",sep="",collapse=""),"x",
+                    n.x.clim,",sp=rep(0.01,",n.x.clim,"))+x.nonclim+x.factor",sep="",collapse="")
+            }
         }
         gam.formula <- as.formula(gam.formula)
         gamfit3 <- gam(gam.formula,family=binomial,data=gamdata)
@@ -146,12 +162,22 @@ generate.initial.values <- function(y,x.clim,x.nonclim=NULL,
     }else{ # when n.x.clim==1, use GAM
         #require(mgcv)
         if(is.null(x.nonclim)){
-            gam.formula <- as.formula("y~s(x1)")
+            if(is.null(x.factor)){
+                gam.formula <- as.formula("y~s(x1)")
+            }else{
+                gam.formula <- as.formula("y~s(x1)+x.factor")
+            }
         }else{
-            gam.formula <- as.formula("y~s(x1)+x.nonclim")
+            if(is.null(x.factor)){
+                gam.formula <- as.formula("y~s(x1)+x.nonclim")
+            }else{
+                gam.formula <- as.formula("y~s(x1)+x.nonclim+x.factor")
+            }
         }
         unigamfit <- gam(gam.formula,family=binomial,data=gamdata)
-        plot(unigamfit)
+        if(!silent){
+            plot(unigamfit)
+        }
         predunigamfit <- predict(unigamfit,newdata=newgamdat,type="link")
         maxfun <- which.max(predunigamfit)
         ax.init <- x[maxfun]

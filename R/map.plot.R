@@ -55,8 +55,8 @@ map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL
         x.envelope <- env.fn(env.pars,x.clim.std)$x.envelope
         nonlinpart <- 0
         if("x.nonclim" %in% names(inputs)){
-            pars.nonclim <- coef(inputs$nonclim.glm)[names(x.nonclim)]
             x.nonclim <- inputs$x.nonclim
+            pars.nonclim <- coef(inputs$nonclim.glm)[names(x.nonclim)]
             x.nonclim.means <- colMeans(x.nonclim)
             x.nonclim.new.centred <- matrix(rep(x.nonclim.means,nrow(x.nonclim.new)),byrow=TRUE,nrow=nrow(x.nonclim.new))
             nonlinpart <- nonlinpart+x.nonclim.new.centred%*%pars.nonclim
@@ -74,8 +74,12 @@ map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL
                 x.factor.new[,i] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor.new[,i],]
               }
             }
-            pars.factor <- coef(inputs$nonclim.glm)[-names(x.nonclim)]
-            nonlinpart <- nonlinpart+x.factor.new%*%pars.factor
+            if("x.nonclim" %in% names(inputs)){
+                pars.factor <- coef(inputs$nonclim.glm)[!(names(coef(inputs$nonclim.glm)) %in% names(x.nonclim))]
+            }else{
+                pars.factor <- coef(inputs$nonclim.glm)
+            }
+            nonlinpart <- nonlinpart+as.matrix(x.factor.new)%*%pars.factor
         }  
         linpred <- x.envelope+nonlinpart
         plot.p <- 1/(1+exp(linpred))

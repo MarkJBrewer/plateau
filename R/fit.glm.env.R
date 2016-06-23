@@ -5,11 +5,19 @@
 #' exploratory analysis and for obtaining starting values for a Bayesian
 #' implementation of the plateau envelope fitted via MCMC.
 #'
-#' @param y The binary response variable (taking values 0 or 1 for absence and
-#' presence respectively).
-#' @param x.clim The n by p matrix of climate covariates.
-#' @param x.nonclim The n by p2 matrix of non-climate covariates.
-#' @param x.factor The n by p3 matrix of non-climate factors.
+#' @param data The data frame (with n rows) containing all the variables for analysis.
+#' @param y A string denoting the binary response variable (taking values 0 or 1 for absence and
+#' presence respectively); must correspond to a column name in the data frame
+#' specied at \code{data}.
+#' @param x.clim A vector (length p) of strings denoting which columns in the supplied data
+#' frame correspond to the climate covariates; must correspond to column names in the data frame
+#' specied at \code{data}.
+#' @param x.nonclim A vector (length p2) of strings denoting which columns in the supplied data
+#' frame correspond to the  non-climate covariates; must correspond to column names in the data frame
+#' specied at \code{data}.
+#' @param x.factor A vector (length p3) of strings denoting which columns in the supplied data
+#' frame correspond to the non-climate factors; must correspond to column names in the data frame
+#' specied at \code{data}.
 #' @param initial.pars.input A vector of length 2p+p+2+p(p-1)/2 containing
 #' starting values for each parameter; if missing, the code will suggest
 #' starting values. If \code{x.factor} is non-null, there will be a total of
@@ -49,35 +57,45 @@
 #' \item{\code{x.clim}}{The climate data, also for the plotting functions.}
 #' }
 #' @export
-fit.glm.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
+fit.glm.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     initial.pars.input,random.search=FALSE,n.iter=100,constrain.beta=FALSE,
     slope.limit=7,silent=TRUE){
-    x.clim <- as.matrix(x.clim)
-    n.x.clim <- ncol(x.clim)
+    y.name <- y
+    y <- data[,y]
+    n.x.clim <- length(x.clim)
+    x.clim <- as.matrix(data[,x.clim])
+    x.nonclim.names <- x.nonclim
+    x.factor.names <- x.factor
     if(!is.null(x.nonclim)){
         if(!is.null(x.factor)){
-            x.nonclim <- as.matrix(x.nonclim)
-            x.nonclim.names <- colnames(x.nonclim)
-            x.factor <- as.matrix(x.factor)
-            x.factor.names <- colnames(x.factor)
-            x.nonclim.formula <- as.formula(paste("y~offset(x.envelope)-1+",
+            x.nonclim <- as.matrix(data[,x.nonclim])
+            x.factor <- data[,x.factor]
+            x.nonclim.formula <- as.formula(paste(y.name,"~offset(x.envelope)-1+",
                 paste(x.nonclim.names,collapse="+"),
                 paste(x.factor.names,collapse="+"),sep=""))
         }else{
-            x.nonclim <- as.matrix(x.nonclim)
-            x.nonclim.names <- colnames(x.nonclim)
-            x.nonclim.formula <- as.formula(paste("y~offset(x.envelope)-1+",
+            x.nonclim <- as.matrix(data[,x.nonclim])
+            x.nonclim.formula <- as.formula(paste(y.name,"~offset(x.envelope)-1+",
                 paste(x.nonclim.names,collapse="+"),sep=""))
         }
     }else{
         if(!is.null(x.factor)){
-            x.factor <- as.matrix(x.factor)
-            x.factor.names <- colnames(x.factor)
-            x.nonclim.formula <- as.formula(paste("y~offset(x.envelope)-1+",
+            x.factor <- data[,x.factor]
+            x.nonclim.formula <- as.formula(paste(y.name,"~offset(x.envelope)-1+",
                 paste(x.factor.names,collapse="+"),sep=""))
         }else{
             x.nonclim.formula <- NULL
         }
+    }
+    if(!is.null(x.factor)){
+      if(length(x.factor.names)==1){
+        #contrasts(x.factor) <- "contr.sum"
+        #tempdata[,x.factor] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor],]
+      }else{
+        for(i in 1:length(x.factor.names)){
+            #contrasts(x.factor[,i]) <- "contr.sum"
+        }
+      }
     }
     # Now standardise the climate variables by mapping onto [0,1]
     x.clim.std <- apply(x.clim,2,function(x){
@@ -97,8 +115,8 @@ fit.glm.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
     }
     # Obtain our first set of estimate parameters from optim()
     fit1 <- optim(par=initial.pars,fn=glm.env.fn,hessian=FALSE,
-        control=list(maxit=10000),y=y,x.clim=x.clim.std,x.nonclim=x.nonclim,
-        x.nonclim.formula=x.nonclim.formula,x.factor=x.factor,
+        control=list(maxit=10000),data=data,y=y.name,x.clim=x.clim.std,x.nonclim=x.nonclim.names,
+        x.nonclim.formula=x.nonclim.formula,x.factor=x.factor.names,
         constrain.beta=constrain.beta,slope.limit=slope.limit)
     current.pars <- fit1$par
     current.best <- fit1$value
@@ -112,9 +130,8 @@ fit.glm.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
                                                  # convergence (possibly local)
                 old.current.best.i <- current.best.i
                 fit1 <- optim(par=current.pars,fn=glm.env.fn,hessian=FALSE,
-                    control=list(maxit=10000),y=y,x.clim=x.clim.std,
-                    x.nonclim=x.nonclim,x.nonclim.formula=x.nonclim.formula,
-                    x.factor=x.factor,
+                    control=list(maxit=10000),data=data,y=y.name,x.clim=x.clim.std,x.nonclim=x.nonclim.names,
+                    x.nonclim.formula=x.nonclim.formula,x.factor=x.factor.names,
                     constrain.beta=constrain.beta,slope.limit=slope.limit)
                 new.value <- fit1$value
                 if(current.best.i>new.value){
@@ -152,9 +169,8 @@ fit.glm.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
             old.current.best <- current.best
             current.pars <- fit1$par
             fit1 <- optim(par=current.pars,fn=glm.env.fn,hessian=FALSE,
-                control=list(maxit=10000),y=y,x.clim=x.clim.std,
-                x.nonclim=x.nonclim,x.nonclim.formula=x.nonclim.formula,
-                x.factor=x.factor,
+                control=list(maxit=10000),data=data,y=y.name,x.clim=x.clim.std,x.nonclim=x.nonclim.names,
+                x.nonclim.formula=x.nonclim.formula,x.factor=x.factor.names,
                 constrain.beta=constrain.beta,slope.limit=slope.limit)
             new.value <- fit1$value
             if(current.best>new.value){
@@ -163,14 +179,51 @@ fit.glm.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
             }
         }
     }
-    if(!is.null(x.nonclim) || !is.null(x.factor)){
+    if(!is.null(x.nonclim)){
+      if(!is.null(x.factor)){
         x.envelope <- env.fn(pars=current.best.fit$par,x.clim=x.clim.std,
             slope.limit=slope.limit)$x.envelope
-        tempdata <- data.frame(y,x.envelope,x.nonclim,x.factor)
+        tempdata <- data[,c(y.name,x.nonclim.names,x.factor.names)]
+        tempdata$x.envelope <- x.envelope
+        if(length(x.factor.names)==1){
+          temp.nlevels <- nlevels(tempdata[,x.factor.names])
+          tempdata[,x.factor.names] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names],]
+        }else{
+          for(i in 1:length(x.factor.names)){
+            temp.nlevels <- nlevels(tempdata[,x.factor.names[i]])
+            tempdata[,x.factor.names[i]] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names[i]],]
+          }
+        }
         current.best.fit$nonclim.glm <- glm(x.nonclim.formula,data=tempdata,
             family=binomial)
+      }else{
+        x.envelope <- env.fn(pars=current.best.fit$par,x.clim=x.clim.std,
+                             slope.limit=slope.limit)$x.envelope
+        tempdata <- data[,c(y.name,x.nonclim.names)]
+        tempdata$x.envelope <- x.envelope
+        current.best.fit$nonclim.glm <- glm(x.nonclim.formula,data=tempdata,
+              family=binomial)
+      }
     }else{
+      if(!is.null(x.factor)){
+        x.envelope <- env.fn(pars=current.best.fit$par,x.clim=x.clim.std,
+                             slope.limit=slope.limit)$x.envelope
+        tempdata <- data[,c(y.name,x.factor.names)]
+        tempdata$x.envelope <- x.envelope
+        if(length(x.factor.names)==1){
+          temp.nlevels <- nlevels(tempdata[,x.factor.names])
+          tempdata[,x.factor.names] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names],]
+        }else{
+          for(i in 1:length(x.factor.names)){
+            temp.nlevels <- nlevels(tempdata[,x.factor.names[i]])
+            tempdata[,x.factor.names[i]] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names[i]],]
+          }
+        }
+        current.best.fit$nonclim.glm <- glm(x.nonclim.formula,data=tempdata,
+                                            family=binomial)        
+      }else{
         current.best.fit$nonclim.glm <- NULL
+      }
     }
     # Add the data, mainly for the plotting functions
     current.best.fit$y <- y

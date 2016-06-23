@@ -3,16 +3,19 @@
 #' \code{fit.bugs.env} fits a spatial GLM with plateau envelope on the climate
 #' covariates via MCMC in WinBUGS.
 #'
-#' @param y The binary response variable (taking values 0 or 1 for absence and
-#' presence respectively).
-#' @param x.clim The n by p matrix of climate covariates. These covariates
-#' will be fitted using the climate envelope methodology.
-#' @param x.nonclim The n by p2 matrix of non-climate covariates. These covariates
-#' will be fitted as ordinary linear terms. However, more flexible models can
-#' be fitted if bases are supplied (e.g. columns from \code{poly} to fit polynomials,
-#' or from spline basis functions such as \code{bs} or \code{ns} to fit simple Generalised
-#' Additive Models).
-#' @param x.factor The n by p3 matrix of non-climate factors.
+#' @param data The data frame (with n rows) containing all the variables for analysis.
+#' @param y A string denoting the binary response variable (taking values 0 or 1 for absence and
+#' presence respectively); must correspond to a column name in the data frame
+#' specied at \code{data}.
+#' @param x.clim A vector (length p) of strings denoting which columns in the supplied data
+#' frame correspond to the climate covariates; must correspond to column names in the data frame
+#' specied at \code{data}.
+#' @param x.nonclim A vector (length p2) of strings denoting which columns in the supplied data
+#' frame correspond to the  non-climate covariates; must correspond to column names in the data frame
+#' specied at \code{data}.
+#' @param x.factor A vector (length p3) of strings denoting which columns in the supplied data
+#' frame correspond to the non-climate factors; must correspond to column names in the data frame
+#' specied at \code{data}.
 #' @param car.sigma Standard deviation of the WinBUGS \code{car.normal}
 #' process; needs to be a constant in the case of a binary response.
 #' @param num A vector (length n) of the numbers of neighbours of each cell, in
@@ -152,7 +155,7 @@
 #'                    formula for a cone.}
 #' }
 #' @export
-fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
+fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     car.sigma=0.1,num,adj,u,
     prior.ax,prior.beta,prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
@@ -172,8 +175,8 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
         on.exit(setwd(savedWD), add = TRUE)
         inTempDir <- TRUE
     }
-    x.clim <- as.matrix(x.clim)
-    n.x.clim <- ncol(x.clim)
+    n.x.clim <- length(x.clim)
+    x.clim <- as.matrix(data[,x.clim])
     beta.top <- 2*n.x.clim
     # Now standardise the climate variables by mapping onto [0,1]
     x.clim.std <- apply(x.clim,2,function(x){
@@ -181,6 +184,21 @@ fit.bugs.env <- function(y,x.clim,x.nonclim=NULL,x.factor=NULL,
         x.max <- max(x)
         return((x-x.min)/(x.max-x.min))
     })
+    x.nonclim.names <- x.nonclim
+    x.factor.names <- x.factor
+    if(!is.null(x.nonclim)){
+      if(!is.null(x.factor)){
+        x.nonclim <- as.matrix(data[,x.nonclim])
+        x.factor <- as.matrix(data[,x.factor])
+        
+      }else{
+        x.nonclim <- as.matrix(data[,x.nonclim])
+      }
+    }else{
+      if(!is.null(x.factor)){
+        x.factor <- as.matrix(data[,x.factor])
+      }
+    }
     # Set the clique parameters if not supplied, to in effect run with only one
     # clique
     if(missing(u.clique.start)){

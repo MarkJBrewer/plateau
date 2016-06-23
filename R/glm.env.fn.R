@@ -25,11 +25,13 @@
 #' @return The (scalar) deviance for fitted GLM using specified envelope
 #' (possibly including a ridge penalty if set).
 #' @export
-glm.env.fn <- function(pars,y,x.clim,x.nonclim=NULL,x.nonclim.formula=NULL,
+glm.env.fn <- function(pars,data,y,x.clim,x.nonclim=NULL,x.nonclim.formula=NULL,
     x.factor=NULL,constrain.beta=FALSE,slope.limit=7){
     n.x.clim <- ncol(x.clim)
     env.fn.object <- env.fn(pars=pars,x.clim=x.clim,slope.limit=slope.limit)
     x.envelope <- env.fn.object$x.envelope
+    y.name <- y
+    y <- data[,y]
     if(mean(env.fn.object$x.envelope) < -2000){
         return(9e100)
     }else{
@@ -38,8 +40,39 @@ glm.env.fn <- function(pars,y,x.clim,x.nonclim=NULL,x.nonclim.formula=NULL,
         if(is.null(x.nonclim) && is.null(x.factor)){
             glm.temp <- glm(y~offset(x.envelope)-1,family=binomial)
         }else{
-            tempdata <- data.frame(y,x.envelope,x.nonclim,x.factor)
-            glm.temp <- try(glm(x.nonclim.formula,data=tempdata,family=binomial))
+            if(!is.null(x.nonclim)){
+              if(!is.null(x.factor)){
+                tempdata <- data[,c(y.name,x.nonclim,x.factor)]
+                tempdata$x.envelope <- x.envelope
+              }else{
+                tempdata <- data[,c(y.name,x.nonclim)]
+                tempdata$x.envelope <- x.envelope
+              }
+            }else{
+              if(!is.null(x.factor)){
+                tempdata <- data[,c(y.name,x.factor)]
+                tempdata$x.envelope <- x.envelope              }
+            }
+            if(!is.null(x.factor)){
+              if(length(x.factor)==1){
+                temp.nlevels <- nlevels(tempdata[,x.factor])
+                tempdata[,x.factor] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor],]
+              }else{
+                for(i in 1:length(x.factor)){
+                  temp.nlevels <- nlevels(tempdata[,x.factor[i]])
+                  tempdata[,x.factor[i]] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor[i]],]
+                }
+              }
+            }
+          #print(names(tempdata))
+          #print(str(tempdata))
+          #print("glm1")
+          #print(summary(glm(x.nonclim.formula,data=tempdata,family=binomial)))
+          #print((glm(x.nonclim.formula,data=tempdata,family=binomial)$contrasts))
+          #print("glm2")
+          #print(glm(x.nonclim.formula,data=tempdata,family=binomial,contrasts=list(FAC1="contr.poly")))
+          #print((glm(x.nonclim.formula,data=tempdata,family=binomial)$contrasts))
+          glm.temp <- try(glm(x.nonclim.formula,data=tempdata,family=binomial))
         }
         glm.deviance <- glm.temp$deviance
         # Impose penalty on the difference between the two betas for the same

@@ -175,6 +175,8 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         on.exit(setwd(savedWD), add = TRUE)
         inTempDir <- TRUE
     }
+    #y.name <- y
+    y <- data[,y]
     n.x.clim <- length(x.clim)
     x.clim <- as.matrix(data[,x.clim])
     beta.top <- 2*n.x.clim
@@ -434,6 +436,7 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     az <- initial.pars[beta.top+n.x.clim+2]
     beta0 <- az-exp(initial.pars[beta.top+n.x.clim+1])
     ax.mat <- matrix(rep(ax.vec,each=n.data),ncol=n.x.clim)
+    print(dim(ax.mat))
     if(n.x.clim!=1){
         gamma.mat <- array(NA,dim=c(n.x.clim,n.x.clim))
         gamma.mat[t(upper.tri(gamma.mat))] <- initial.pars[(beta.top+n.x.clim+3):length(initial.pars)]

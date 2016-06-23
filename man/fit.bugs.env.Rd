@@ -4,7 +4,7 @@
 \alias{fit.bugs.env}
 \title{Fit a spatial, Bayesian, plateau envelope model via MCMC in WinBUGS}
 \usage{
-fit.bugs.env(y, x.clim, x.nonclim = NULL, x.factor = NULL,
+fit.bugs.env(data, y, x.clim, x.nonclim = NULL, x.factor = NULL,
   car.sigma = 0.1, num, adj, u, prior.ax, prior.beta, prior.beta0.difference,
   constrain.beta, initial.pars.input, informative.priors = list(beta = FALSE,
   beta0 = FALSE, ax = FALSE), burnin = 5000, post.burnin = 1000,
@@ -16,19 +16,23 @@ fit.bugs.env(y, x.clim, x.nonclim = NULL, x.factor = NULL,
   adj.clique.start, adj.clique.end, clique, clique.i)
 }
 \arguments{
-\item{y}{The binary response variable (taking values 0 or 1 for absence and
-presence respectively).}
+\item{data}{The data frame (with n rows) containing all the variables for analysis.}
 
-\item{x.clim}{The n by p matrix of climate covariates. These covariates
-will be fitted using the climate envelope methodology.}
+\item{y}{A string denoting the binary response variable (taking values 0 or 1 for absence and
+presence respectively); must correspond to a column name in the data frame
+specied at \code{data}.}
 
-\item{x.nonclim}{The n by p2 matrix of non-climate covariates. These covariates
-will be fitted as ordinary linear terms. However, more flexible models can
-be fitted if bases are supplied (e.g. columns from \code{poly} to fit polynomials,
-or from spline basis functions such as \code{bs} or \code{ns} to fit simple Generalised
-Additive Models).}
+\item{x.clim}{A vector (length p) of strings denoting which columns in the supplied data
+frame correspond to the climate covariates; must correspond to column names in the data frame
+specied at \code{data}.}
 
-\item{x.factor}{The n by p3 matrix of non-climate factors.}
+\item{x.nonclim}{A vector (length p2) of strings denoting which columns in the supplied data
+frame correspond to the  non-climate covariates; must correspond to column names in the data frame
+specied at \code{data}.}
+
+\item{x.factor}{A vector (length p3) of strings denoting which columns in the supplied data
+frame correspond to the non-climate factors; must correspond to column names in the data frame
+specied at \code{data}.}
 
 \item{car.sigma}{Standard deviation of the WinBUGS \code{car.normal}
 process; needs to be a constant in the case of a binary response.}

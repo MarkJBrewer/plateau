@@ -4,32 +4,32 @@
 \alias{map.plot}
 \title{Plot maps showing predictions for a given set of climate data.}
 \usage{
-map.plot(inputs, plot.type = "Prediction", x.clim.new, x.clim,
-  x.nonclim = NULL, pars.nonclim = NULL, coordinates, species.name = "",
-  scenario.name = "", save.PDF = FALSE, file.name)
+map.plot(inputs, plot.type = "Prediction", x.clim.new, x.nonclim.new = NULL,
+  x.factor.new = NULL, coordinates, species.name = "", scenario.name = "",
+  save.PDF = FALSE, file.name)
 }
 \arguments{
-\item{inputs}{A numeric vector. If \code{plot.type} has value "Prediction", then it contains the
-envelope parameters and has length 2p+p+2+p(p-1)/2. If \code{plot.type} has value "Presence",
-then it should have length n and contain a vector of 0's and 1's (or FALSE and TRUE) marking absence
+\item{inputs}{If \code{plot.type} has value "Prediction", then \code{inputs} contains a fitted model
+object as output by \code{fit.glm.env} or \code{fit.bugs.env}. If \code{plot.type} has value "Presence",
+then \code{inputs} should be a numeric vector of length n and containing 0's and 1's (or FALSE and TRUE) marking absence
 and presence respectively. The "Prediction" form is used for plotting shaded predictions for
-the climate envelope models; the "Presence" form is used for making simple presence/absence plots.
-For presence/absence plots, \code{x.clim.new} and \code{x.clim} are ignored.}
+fitted climate envelope models; the "Presence" form is used for making simple presence/absence plots.
+For presence/absence plots, \code{x.clim.new}, and other similar arguments are ignored.}
 
 \item{plot.type}{A string to indicate what kind of map to plot; takes values "Prediction" (the
 default) or "Presence". (In fact, any string not identical to "Prediction" will lead to a Presence plot.)}
 
-\item{x.clim.new}{A matrix, having the same columns as \code{x.clim}, and
+\item{x.clim.new}{A matrix, having the same columns as \code{inputs$x.clim}, and
 containing the points in climate space at which to evaluate the
 envelope and produce predictions in space.}
 
-\item{x.clim}{The n by p matrix of climate covariates.}
-
-\item{x.nonclim}{The n by p2 matrix of non-climate covariates (default
+\item{x.nonclim.new}{The n by p2 matrix of non-climate covariates for prediction, only to
+be specified if a corresponding \code{x.nonclim} element exists in \code{inputs} (default
 \code{NULL}).}
 
-\item{pars.nonclim}{A vector of length p2 specifying the parameter estimates
-to be used in prediction for the non-climate}
+\item{x.factor.new}{The n by p3 matrix of non-climate factors for prediction, only to
+be specified if a corresponding \code{x.factor} element exists in \code{inputs} (default
+\code{NULL}).}
 
 \item{coordinates}{An n by 2 matrix or list or data frame, having elements
  (or columns) \code{long} and \code{lat} for longitude and latitude

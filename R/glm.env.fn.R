@@ -6,15 +6,21 @@
 #' data are implemented.
 #'
 #' @param pars The vector of envelope parameters, length 2p+p+2+p(p-1)/2.
-#' @param y The binary response variable (taking values 0 or 1 for absence and
-#' presence respectively).
-#' @param x.clim The n by p matrix of climate covariates.
-#' @param x.nonclim The n by p2 matrix of non-climate covariates (default
-#' \code{NULL}).
+#' @param data The data frame (with n rows) containing all the variables for analysis.
+#' @param y A string denoting the binary response variable (taking values 0 or 1 for absence and
+#' presence respectively); must correspond to a column name in the data frame
+#' specied at \code{data}.
+#' @param x.clim A vector (length p) of strings denoting which columns in the supplied data
+#' frame correspond to the climate covariates; must correspond to column names in the data frame
+#' specied at \code{data}.
+#' @param x.nonclim A vector (length p2) of strings denoting which columns in the supplied data
+#' frame correspond to the  non-climate covariates; must correspond to column names in the data frame
+#' specied at \code{data}.
+#' @param x.factor A vector (length p3) of strings denoting which columns in the supplied data
+#' frame correspond to the non-climate factors; must correspond to column names in the data frame
+#' specied at \code{data}.
 #' @param x.nonclim.formula The pre-specified formula if non-climate variables
 #' OR factor variables are included.
-#' @param x.factor The n by p3 matrix of non-climate factors (default
-#' \code{NULL}).
 #' @param constrain.beta Should a ridge penalty be imposed on the betas
 #' (slopes)? Takes the form either of: a matrix of dimension p by 2
 #' (specifying \code{TRUE} for a ridge penalty for a given beta, or

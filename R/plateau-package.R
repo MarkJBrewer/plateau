@@ -27,5 +27,5 @@
 #' @import mapproj
 #' @importFrom grDevices dev.off grey palette pdf trans3d
 #' @importFrom graphics contour legend persp par plot points text
-#' @importFrom stats as.formula binomial coef cor glm lm optim predict rnorm runif
+#' @importFrom stats as.formula binomial coef cor glm lm optim predict rnorm runif contr.helmert contr.sum
 NULL

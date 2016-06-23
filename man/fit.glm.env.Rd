@@ -4,19 +4,28 @@
 \alias{fit.glm.env}
 \title{Fit a plateau envelope via a (non-spatial) GLM and non-linear optimisation}
 \usage{
-fit.glm.env(y, x.clim, x.nonclim = NULL, x.factor = NULL,
+fit.glm.env(data, y, x.clim, x.nonclim = NULL, x.factor = NULL,
   initial.pars.input, random.search = FALSE, n.iter = 100,
   constrain.beta = FALSE, slope.limit = 7, silent = TRUE)
 }
 \arguments{
-\item{y}{The binary response variable (taking values 0 or 1 for absence and
-presence respectively).}
+\item{data}{The data frame (with n rows) containing all the variables for analysis.}
 
-\item{x.clim}{The n by p matrix of climate covariates.}
+\item{y}{A string denoting the binary response variable (taking values 0 or 1 for absence and
+presence respectively); must correspond to a column name in the data frame
+specied at \code{data}.}
 
-\item{x.nonclim}{The n by p2 matrix of non-climate covariates.}
+\item{x.clim}{A vector (length p) of strings denoting which columns in the supplied data
+frame correspond to the climate covariates; must correspond to column names in the data frame
+specied at \code{data}.}
 
-\item{x.factor}{The n by p3 matrix of non-climate factors.}
+\item{x.nonclim}{A vector (length p2) of strings denoting which columns in the supplied data
+frame correspond to the  non-climate covariates; must correspond to column names in the data frame
+specied at \code{data}.}
+
+\item{x.factor}{A vector (length p3) of strings denoting which columns in the supplied data
+frame correspond to the non-climate factors; must correspond to column names in the data frame
+specied at \code{data}.}
 
 \item{initial.pars.input}{A vector of length 2p+p+2+p(p-1)/2 containing
 starting values for each parameter; if missing, the code will suggest

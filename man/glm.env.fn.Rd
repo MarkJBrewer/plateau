@@ -4,25 +4,33 @@
 \alias{glm.env.fn}
 \title{Calculate deviance of plateau envelope via GLM}
 \usage{
-glm.env.fn(pars, y, x.clim, x.nonclim = NULL, x.nonclim.formula = NULL,
-  x.factor = NULL, constrain.beta = FALSE, slope.limit = 7)
+glm.env.fn(pars, data, y, x.clim, x.nonclim = NULL,
+  x.nonclim.formula = NULL, x.factor = NULL, constrain.beta = FALSE,
+  slope.limit = 7)
 }
 \arguments{
 \item{pars}{The vector of envelope parameters, length 2p+p+2+p(p-1)/2.}
 
-\item{y}{The binary response variable (taking values 0 or 1 for absence and
-presence respectively).}
+\item{data}{The data frame (with n rows) containing all the variables for analysis.}
 
-\item{x.clim}{The n by p matrix of climate covariates.}
+\item{y}{A string denoting the binary response variable (taking values 0 or 1 for absence and
+presence respectively); must correspond to a column name in the data frame
+specied at \code{data}.}
 
-\item{x.nonclim}{The n by p2 matrix of non-climate covariates (default
-\code{NULL}).}
+\item{x.clim}{A vector (length p) of strings denoting which columns in the supplied data
+frame correspond to the climate covariates; must correspond to column names in the data frame
+specied at \code{data}.}
+
+\item{x.nonclim}{A vector (length p2) of strings denoting which columns in the supplied data
+frame correspond to the  non-climate covariates; must correspond to column names in the data frame
+specied at \code{data}.}
 
 \item{x.nonclim.formula}{The pre-specified formula if non-climate variables
 OR factor variables are included.}
 
-\item{x.factor}{The n by p3 matrix of non-climate factors (default
-\code{NULL}).}
+\item{x.factor}{A vector (length p3) of strings denoting which columns in the supplied data
+frame correspond to the non-climate factors; must correspond to column names in the data frame
+specied at \code{data}.}
 
 \item{constrain.beta}{Should a ridge penalty be imposed on the betas
 (slopes)? Takes the form either of: a matrix of dimension p by 2

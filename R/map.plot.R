@@ -36,7 +36,7 @@
 #' @export
 map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL,
     x.factor.new=NULL,coordinates,species.name="",scenario.name="",save.PDF=FALSE,file.name){
-    if(plot.type="Prediction"){
+    if(plot.type=="Prediction"){
       env.pars <- inputs$par
     }
     if(save.PDF & missing(file.name)){
@@ -55,7 +55,7 @@ map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL
         x.envelope <- env.fn(env.pars,x.clim.std)$x.envelope
         nonlinpart <- 0
         if("x.nonclim" %in% names(inputs)){
-            pars.nonclim <- coef(fagus.glm.1$nonclim.glm)[names(x.nonclim)]
+            pars.nonclim <- coef(inputs$nonclim.glm)[names(x.nonclim)]
             x.nonclim <- inputs$x.nonclim
             x.nonclim.means <- colMeans(x.nonclim)
             x.nonclim.new.centred <- matrix(rep(x.nonclim.means,nrow(x.nonclim.new)),byrow=TRUE,nrow=nrow(x.nonclim.new))
@@ -74,7 +74,7 @@ map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL
                 x.factor.new[,i] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor.new[,i],]
               }
             }
-            pars.factor <- coef(fagus.glm.1$nonclim.glm)[-names(x.nonclim)]
+            pars.factor <- coef(inputs$nonclim.glm)[-names(x.nonclim)]
             nonlinpart <- nonlinpart+x.factor.new%*%pars.factor
         }  
         linpred <- x.envelope+nonlinpart

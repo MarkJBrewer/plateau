@@ -3,22 +3,23 @@
 #' \code{map.plot} plots the fitted maps of "climate suitability" for a given
 #' set of climate variable values. Can also be use to plot maps of the presence/absence data.
 #'
-#' @param inputs A numeric vector. If \code{plot.type} has value "Prediction", then it contains the
-#' envelope parameters and has length 2p+p+2+p(p-1)/2. If \code{plot.type} has value "Presence",
-#' then it should have length n and contain a vector of 0's and 1's (or FALSE and TRUE) marking absence
+#' @param inputs If \code{plot.type} has value "Prediction", then \code{inputs} contains a fitted model
+#' object as output by \code{fit.glm.env} or \code{fit.bugs.env}. If \code{plot.type} has value "Presence",
+#' then \code{inputs} should be a numeric vector of length n and containing 0's and 1's (or FALSE and TRUE) marking absence
 #' and presence respectively. The "Prediction" form is used for plotting shaded predictions for
-#' the climate envelope models; the "Presence" form is used for making simple presence/absence plots.
-#' For presence/absence plots, \code{x.clim.new} and \code{x.clim} are ignored.
+#' fitted climate envelope models; the "Presence" form is used for making simple presence/absence plots.
+#' For presence/absence plots, \code{x.clim.new}, and other similar arguments are ignored.
 #' @param plot.type A string to indicate what kind of map to plot; takes values "Prediction" (the
 #' default) or "Presence". (In fact, any string not identical to "Prediction" will lead to a Presence plot.)
-#' @param x.clim.new A matrix, having the same columns as \code{x.clim}, and
+#' @param x.clim.new A matrix, having the same columns as \code{inputs$x.clim}, and
 #' containing the points in climate space at which to evaluate the
 #' envelope and produce predictions in space.
-#' @param x.clim The n by p matrix of climate covariates.
-#' @param x.nonclim The n by p2 matrix of non-climate covariates (default
+#' @param x.nonclim.new The n by p2 matrix of non-climate covariates for prediction, only to
+#' be specified if a corresponding \code{x.nonclim} element exists in \code{inputs} (default
 #' \code{NULL}).
-#' @param pars.nonclim A vector of length p2 specifying the parameter estimates
-#' to be used in prediction for the non-climate
+#' @param x.factor.new The n by p3 matrix of non-climate factors for prediction, only to
+#' be specified if a corresponding \code{x.factor} element exists in \code{inputs} (default
+#' \code{NULL}).
 #' @param coordinates An n by 2 matrix or list or data frame, having elements
 #'  (or columns) \code{long} and \code{lat} for longitude and latitude
 #' respectively.
@@ -33,15 +34,16 @@
 #' @return Map of predictions of "climate suitability".
 #' @seealso \code{link{envelope.plot}}
 #' @export
-map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.clim,x.nonclim=NULL,pars.nonclim=NULL,
-    coordinates,species.name="",scenario.name="",save.PDF=FALSE,file.name){
+map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL,
+    x.factor.new=NULL,coordinates,species.name="",scenario.name="",save.PDF=FALSE,file.name){
+    if(plot.type="Prediction"){
+      env.pars <- inputs$par
+    }
     if(save.PDF & missing(file.name)){
         file.name <- paste("Map",species.name,scenario.name,".pdf",sep="")
     }
     if(plot.type=="Prediction"){
-        if(missing(x.clim)){
-            x.clim <- x.clim.new
-        }
+        x.clim <- inputs$x.clim
         n.x.clim <- ncol(x.clim.new)
         # Now standardise the climate variables by mapping onto [0,1]
         x.clim.std <- x.clim.new
@@ -50,14 +52,31 @@ map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.clim,x.nonclim=N
         for(i in 1:n.x.clim){
             x.clim.std[,i] <- (x.clim.new[,i]-x.clim.min[i])/(x.clim.max[i]-x.clim.min[i])
         }
-        x.envelope <- env.fn(inputs,x.clim.std)$x.envelope
-        # Check the columns of x.nonclim are in the same order as the coefficients
-        if(!is.null(x.nonclim)){
-            x.nonclim <- as.matrix(x.nonclim[names(pars.nonclim)])
-            nonlinpart <- x.nonclim%*%pars.nonclim
-        }else{
-            nonlinpart <- 0
+        x.envelope <- env.fn(env.pars,x.clim.std)$x.envelope
+        nonlinpart <- 0
+        if("x.nonclim" %in% names(inputs)){
+            pars.nonclim <- coef(fagus.glm.1$nonclim.glm)[names(x.nonclim)]
+            x.nonclim <- inputs$x.nonclim
+            x.nonclim.means <- colMeans(x.nonclim)
+            x.nonclim.new.centred <- matrix(rep(x.nonclim.means,nrow(x.nonclim.new)),byrow=TRUE,nrow=nrow(x.nonclim.new))
+            nonlinpart <- nonlinpart+x.nonclim.new.centred%*%pars.nonclim
         }
+        if("x.factor" %in% names(inputs)){
+            x.factor <- inputs$x.factor
+            if(length(x.factor)==1){
+              temp.nlevels <- nlevels(x.factor)
+              x.factor <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor,]
+              x.factor.new <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor.new,]
+            }else{
+              for(i in 1:ncol(x.factor)){
+                temp.nlevels <- nlevels(x.factor[,i])
+                x.factor[,i] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor[,i],]
+                x.factor.new[,i] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor.new[,i],]
+              }
+            }
+            pars.factor <- coef(fagus.glm.1$nonclim.glm)[-names(x.nonclim)]
+            nonlinpart <- nonlinpart+x.factor.new%*%pars.factor
+        }  
         linpred <- x.envelope+nonlinpart
         plot.p <- 1/(1+exp(linpred))
         plot.p <- round(plot.p*1000)

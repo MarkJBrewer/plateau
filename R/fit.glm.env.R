@@ -87,16 +87,6 @@ fit.glm.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
             x.nonclim.formula <- NULL
         }
     }
-    if(!is.null(x.factor)){
-      if(length(x.factor.names)==1){
-        #contrasts(x.factor) <- "contr.sum"
-        #tempdata[,x.factor] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor],]
-      }else{
-        for(i in 1:length(x.factor.names)){
-            #contrasts(x.factor[,i]) <- "contr.sum"
-        }
-      }
-    }
     # Now standardise the climate variables by mapping onto [0,1]
     x.clim.std <- apply(x.clim,2,function(x){
         x.min <- min(x)

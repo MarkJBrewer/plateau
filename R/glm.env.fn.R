@@ -33,6 +33,9 @@
 #' @export
 glm.env.fn <- function(pars,data,y,x.clim,x.nonclim=NULL,x.nonclim.formula=NULL,
     x.factor=NULL,constrain.beta=FALSE,slope.limit=7){
+    contr.env <- function(n){
+        return(diag(n)[,1:(n-1)]-diag(n)[,2:n])
+    }
     n.x.clim <- ncol(x.clim)
     env.fn.object <- env.fn(pars=pars,x.clim=x.clim,slope.limit=slope.limit)
     x.envelope <- env.fn.object$x.envelope
@@ -62,11 +65,11 @@ glm.env.fn <- function(pars,data,y,x.clim,x.nonclim=NULL,x.nonclim.formula=NULL,
             if(!is.null(x.factor)){
               if(length(x.factor)==1){
                 temp.nlevels <- nlevels(tempdata[,x.factor])
-                tempdata[,x.factor] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor],]
+                tempdata[,x.factor] <- (contr.env(temp.nlevels))[tempdata[,x.factor],]
               }else{
                 for(i in 1:length(x.factor)){
                   temp.nlevels <- nlevels(tempdata[,x.factor[i]])
-                  tempdata[,x.factor[i]] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor[i]],]
+                  tempdata[,x.factor[i]] <- (contr.env(temp.nlevels))[tempdata[,x.factor[i]],]
                 }
               }
             }

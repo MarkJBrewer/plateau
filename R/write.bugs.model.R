@@ -313,7 +313,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0){
         }
         tau <- car.tau
         for(e in 1:Nfac){
-          facbeta[e,1] <- 0
+          facbeta[e,1] <- -sum(facbeta[e,2:x.factor.lengths[e]])
           for(e1 in 2:x.factor.lengths[e]){
             facbeta[e,e1] ~ dnorm(0,0.001)
           }
@@ -390,7 +390,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0){
           beta[e,2] ~ dnorm(beta.mu[e,2],beta.prec[e,2])%_%I(0,)
         }
         for(e in 1:Nfac){
-          facbeta[e,1] <- 0
+          facbeta[e,1] <- -sum(facbeta[e,2:x.factor.lengths[e]])
           for(e1 in 2:x.factor.lengths[e]){
             facbeta[e,e1] ~ dnorm(0,0.001)
           }
@@ -462,7 +462,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0){
           nonbeta[e] ~ dnorm(0,0.001)
         }
         for(e in 1:Nfac){
-          facbeta[e,1] <- 0
+          facbeta[e,1] <- -sum(facbeta[e,2:x.factor.lengths[e]])
           for(e1 in 2:x.factor.lengths[e]){
             facbeta[e,e1] ~ dnorm(0,0.001)
           }
@@ -538,7 +538,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0){
           nonbeta[e] ~ dnorm(0,0.001)
         }
         for(e in 1:Nfac){
-          facbeta[e,1] <- 0
+          facbeta[e,1] <- -sum(facbeta[e,2:x.factor.lengths[e]])
           for(e1 in 2:x.factor.lengths[e]){
             facbeta[e,e1] ~ dnorm(0,0.001)
           }

@@ -15,7 +15,7 @@ species distribution models for presence/absence data
 \tabular{ll}{
 Package: \tab plateau\cr
 Type: \tab Package\cr
-Version: \tab 0.3.0\cr
+Version: \tab 0.3.1\cr
 Date: \tab 2016-06-23\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr

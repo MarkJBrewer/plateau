@@ -60,6 +60,9 @@
 fit.glm.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     initial.pars.input,random.search=FALSE,n.iter=100,constrain.beta=FALSE,
     slope.limit=7,silent=TRUE){
+    contr.env <- function(n){
+        return(diag(n)[,1:(n-1)]-diag(n)[,2:n])
+    }
     y.name <- y
     y <- data[,y]
     n.x.clim <- length(x.clim)
@@ -177,11 +180,11 @@ fit.glm.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         tempdata$x.envelope <- x.envelope
         if(length(x.factor.names)==1){
           temp.nlevels <- nlevels(tempdata[,x.factor.names])
-          tempdata[,x.factor.names] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names],]
+          tempdata[,x.factor.names] <- (contr.env(temp.nlevels))[tempdata[,x.factor.names],]
         }else{
           for(i in 1:length(x.factor.names)){
             temp.nlevels <- nlevels(tempdata[,x.factor.names[i]])
-            tempdata[,x.factor.names[i]] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names[i]],]
+            tempdata[,x.factor.names[i]] <- (contr.env(temp.nlevels))[tempdata[,x.factor.names[i]],]
           }
         }
         current.best.fit$nonclim.glm <- glm(x.nonclim.formula,data=tempdata,
@@ -202,11 +205,11 @@ fit.glm.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         tempdata$x.envelope <- x.envelope
         if(length(x.factor.names)==1){
           temp.nlevels <- nlevels(tempdata[,x.factor.names])
-          tempdata[,x.factor.names] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names],]
+          tempdata[,x.factor.names] <- (contr.env(temp.nlevels))[tempdata[,x.factor.names],]
         }else{
           for(i in 1:length(x.factor.names)){
             temp.nlevels <- nlevels(tempdata[,x.factor.names[i]])
-            tempdata[,x.factor.names[i]] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[tempdata[,x.factor.names[i]],]
+            tempdata[,x.factor.names[i]] <- (contr.env(temp.nlevels))[tempdata[,x.factor.names[i]],]
           }
         }
         current.best.fit$nonclim.glm <- glm(x.nonclim.formula,data=tempdata,

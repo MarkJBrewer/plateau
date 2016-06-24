@@ -36,8 +36,11 @@
 #' @export
 map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL,
     x.factor.new=NULL,coordinates,species.name="",scenario.name="",save.PDF=FALSE,file.name){
+    contr.env <- function(n){
+        return(diag(n)[,1:(n-1)]-diag(n)[,2:n])
+    }
     if(plot.type=="Prediction"){
-      env.pars <- inputs$par
+        env.pars <- inputs$par
     }
     if(save.PDF & missing(file.name)){
         file.name <- paste("Map",species.name,scenario.name,".pdf",sep="")
@@ -65,13 +68,13 @@ map.plot <- function(inputs,plot.type="Prediction",x.clim.new,x.nonclim.new=NULL
             x.factor <- inputs$x.factor
             if(length(x.factor)==1){
               temp.nlevels <- nlevels(x.factor)
-              x.factor <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor,]
-              x.factor.new <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor.new,]
+              x.factor <- (contr.env(temp.nlevels))[x.factor,]
+              x.factor.new <- (contr.env(temp.nlevels))[x.factor.new,]
             }else{
               for(i in 1:ncol(x.factor)){
                 temp.nlevels <- nlevels(x.factor[,i])
-                x.factor[,i] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor[,i],]
-                x.factor.new[,i] <- (contr.sum(temp.nlevels)+contr.helmert(temp.nlevels))[x.factor.new[,i],]
+                x.factor[,i] <- (contr.env(temp.nlevels))[x.factor[,i],]
+                x.factor.new[,i] <- (contr.env(temp.nlevels))[x.factor.new[,i],]
               }
             }
             if("x.nonclim" %in% names(inputs)){

@@ -3,6 +3,7 @@
 export(env.fn)
 export(envelope.plot)
 export(fit.bugs.env)
+export(fit.bugs.nospatial.env)
 export(fit.glm.env)
 export(generate.initial.values)
 export(glm.env.fn)

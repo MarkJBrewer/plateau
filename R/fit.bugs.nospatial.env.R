@@ -115,7 +115,7 @@
 #'                    formula for a cone.}
 #' }
 #' @export
-fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
+fit.bugs.nospatial.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     prior.ax,prior.beta,prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
     burnin=5000,post.burnin=1000,chains=2,thin=1,

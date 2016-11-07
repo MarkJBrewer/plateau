@@ -82,7 +82,7 @@ the number of total levels across all the factors minus p3 extra parameters.}
 
 \item{informative.priors}{List of logical scalars for which informative
 priors should be used (from: beta, beta0, ax);
-this option uses the \code{function generate.initial.values} to
+this option uses the function \code{generate.initial.values} to
 generate the means, and is an alternative to specifying the
 priors yourself using \code{prior.ax} above etc. Default has all
 options set to \code{FALSE}.}

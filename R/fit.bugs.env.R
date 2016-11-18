@@ -204,26 +204,29 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     # Set the clique parameters if not supplied, to in effect run with only one
     # clique
     if(missing(u.clique.start)){
-        u.clique.start <- 1
+        u.clique.start <- c(1,NA)
     }
     if(missing(u.clique.end)){
-        u.clique.end <- length(y)
+        u.clique.end <- c(length(y),NA)
     }
     if(missing(adj.clique.start)){
-        adj.clique.start <- 1
+        adj.clique.start <- c(1,NA)
     }
     if(missing(adj.clique.end)){
-        adj.clique.end <- length(adj)
+        adj.clique.end <- c(length(adj),NA)
     }
-    NClique <- length(u.clique.start)
+    NClique <- length(u.clique.start)-1
     if(missing(clique)){
         clique <- rep(1,length(y))
     }
     if(missing(clique.i)){
         clique.i <- rep(1,length(y))
     }
-    clique.length <- u.clique.end-u.clique.start+1
-    adj.length <- adj.clique.end-adj.clique.start+1
+    if (missing(u) & NClique==1){
+        u <- as.numeric(rep(NA,length(y)))
+    }
+    clique.length <- u.clique.end[-(NClique+1)]-u.clique.start[-(NClique+1)]+1
+    adj.length <- adj.clique.end[-(NClique+1)]-adj.clique.start[-(NClique+1)]+1
     if(is.null(informative.priors$beta)){
         informative.priors$beta <- FALSE
     }
@@ -235,7 +238,7 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     }
     # Can't give a clique with one observation to car.normal, so ignore these
     NonSingletonClique <- sum(clique.length>1.5)
-    nonsingleton.clique.list <- which(clique.length>1.5)
+    nonsingleton.clique.list <- c(which(clique.length>1.5),NA)
     if(missing(initial.pars.input)){
         if(missing(constrain.beta)){
             initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,

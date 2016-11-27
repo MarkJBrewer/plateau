@@ -45,7 +45,9 @@ order (but see later comment on cliques).}
 \item{u}{Vector of spatial random effects to be supplied as data, of length
 n; mostly \code{NA}s, meaning the u's should be estimated in
 \code{car.normal}, but you may wish to fix some values (e.g. to 0
-for disconnected cells).
+for disconnected cells). If u is missing and there is only one "clique" (i.e.
+connected neighbourhood) then u will be created as a vector of \code{NA}s of
+the right length. u should be specified otherwise; this is deliberate.
 
 The next four inputs are used to set identifiability constraints on the
 modelling.}

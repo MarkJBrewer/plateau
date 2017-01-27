@@ -2,6 +2,7 @@
 
 export(env.fn)
 export(envelope.plot)
+export(envelope.predict)
 export(fit.bugs.env)
 export(fit.bugs.nospatial.env)
 export(fit.glm.env)

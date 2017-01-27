@@ -7,7 +7,7 @@
 #' @param envelope.fit The fitted object from either \code{fit.glm.env} or
 #' \code{fit.bugs.env}.
 #' 
-#' @param newdata A matrix or data frame of new data for prediction.
+#' @param newdata A matrix or data frame containing columns of the climate variables in \code{envelope.fit}.
 #' 
 #' @return A set of predictions from the supplied fitted model evaluated at the covariate values in
 #' object \code{newdata}.
@@ -66,15 +66,6 @@ envelope.predict <- function(envelope.fit,newdata){
     }
   }
   
-  # if(missing(x.labels)){
-  #   x.labels <- paste("Variable",1:n.x.clim)
-  # }
-  # x.plot.seq <- seq(x.plot.lims[1],x.plot.lims[2],length=len)
-  # x.plot <- array(NA,dim=c(len^n.x.clim,n.x.clim))
-  # for(i in 1:n.x.clim){
-  #   x.plot[,i] <- rep(x.plot.seq,times=len^(i-1),each=len^(n.x.clim-i))
-  # }
-  
   x.plot <- newdata.std
   
   ax.mat <- matrix(rep(ax,each=nrow(x.plot)),ncol=n.x.clim)
@@ -84,7 +75,6 @@ envelope.predict <- function(envelope.fit,newdata){
   for(i in 1:n.x.clim){
     beta.mat.prod[,i] <- beta.mat[i,x.mat.ind[,i]]
   }
-  #colnames(x.plot) <- x.clim.names
   x.sum.main <- rowSums(beta.mat.prod*x.plot.a.centre^2)
   if(n.x.clim!=1){
     # Combinations of row, column with values

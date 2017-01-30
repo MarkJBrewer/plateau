@@ -5,10 +5,11 @@
 \title{Fit a spatial, Bayesian, plateau envelope model via MCMC in WinBUGS}
 \usage{
 fit.bugs.env(data, y, x.clim, x.nonclim = NULL, x.factor = NULL,
-  car.sigma = 0.1, num, adj, u, prior.ax, prior.beta, prior.beta0.difference,
-  constrain.beta, initial.pars.input, informative.priors = list(beta = FALSE,
-  beta0 = FALSE, ax = FALSE), burnin = 5000, post.burnin = 1000,
-  chains = 2, thin = 1, working.directory = NULL, silent = TRUE,
+  not.spatial = FALSE, car.sigma = 0.1, num, adj, u, prior.ax, prior.beta,
+  prior.beta0.difference, constrain.beta, initial.pars.input,
+  informative.priors = list(beta = FALSE, beta0 = FALSE, ax = FALSE),
+  burnin = 5000, post.burnin = 1000, chains = 2, thin = 1,
+  working.directory = NULL, silent = TRUE,
   bugs.directory = "C:/Program Files (x86)/WinBUGS14/",
   WinBUGS.debug = FALSE, WinBUGS.code = NULL,
   WinBUGS.code.location = NULL, no.starting.value = NULL,
@@ -33,6 +34,10 @@ specied at \code{data}.}
 \item{x.factor}{A vector (length p3) of strings denoting which columns in the supplied data
 frame correspond to the non-climate factors; must correspond to column names in the data frame
 specied at \code{data}.}
+
+\item{not.spatial}{Logical scalar specifying whether the model should include
+a spatial intrinsic CAR component. Defaults to FALSE, i.e. there \emph{is} a
+spatial component.}
 
 \item{car.sigma}{Standard deviation of the WinBUGS \code{car.normal}
 process; needs to be a constant in the case of a binary response.}

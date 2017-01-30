@@ -4,7 +4,8 @@
 \alias{write.bugs.model}
 \title{Write WinBUGS code to a temporary file}
 \usage{
-write.bugs.model(n.x.clim, n.x.nonclim = 0, n.x.factor = 0)
+write.bugs.model(n.x.clim, n.x.nonclim = 0, n.x.factor = 0,
+  not.spatial = FALSE, working.directory = NULL)
 }
 \arguments{
 \item{n.x.clim}{The number of climate covariates (n); needed as the WinBUGS
@@ -15,6 +16,13 @@ whether or not to include a separate loop for such covariates.}
 
 \item{n.x.factor}{The number of non-climate factors; needed to know
 whether or not to include a separate loop for such factors}
+
+\item{not.spatial}{Logical scalar specifying whether the model should include
+a spatial intrinsic CAR component. Defaults to FALSE, i.e. there \emph{is} a
+spatial component.}
+
+\item{working.directory}{Working directory as supplied by the function \code{fit.bugs.env},
+either from the user or auto-generated.}
 }
 \description{
 Write WinBUGS code to a temporary file

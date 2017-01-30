@@ -16,6 +16,9 @@
 #' @param x.factor A vector (length p3) of strings denoting which columns in the supplied data
 #' frame correspond to the non-climate factors; must correspond to column names in the data frame
 #' specied at \code{data}.
+#' @param not.spatial Logical scalar specifying whether the model should include
+#' a spatial intrinsic CAR component. Defaults to FALSE, i.e. there \emph{is} a
+#' spatial component.
 #' @param car.sigma Standard deviation of the WinBUGS \code{car.normal}
 #' process; needs to be a constant in the case of a binary response.
 #' @param num A vector (length n) of the numbers of neighbours of each cell, in
@@ -158,7 +161,7 @@
 #' }
 #' @export
 fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
-    car.sigma=0.1,num,adj,u,
+    not.spatial=FALSE,car.sigma=0.1,num,adj,u,
     prior.ax,prior.beta,prior.beta0.difference,constrain.beta,initial.pars.input,
     informative.priors=list(beta=FALSE, beta0=FALSE, ax=FALSE),
     burnin=5000,post.burnin=1000,chains=2,thin=1,
@@ -171,11 +174,26 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     # Move to working directory or temporary directory when NULL
     inTempDir <- FALSE
     if(is.null(working.directory)) {
-        working.directory <- tempdir()
-        savedWD <- getwd()
-        setwd(working.directory)
-        on.exit(setwd(savedWD), add = TRUE)
-        inTempDir <- TRUE
+      # create a temp folder for WINBUGS in the current working directory
+      working.directory <- getwd()
+      working.directory <- paste(working.directory,"/temp",format(Sys.time(), "%Y%b%d%H%M"),sep="")
+      if( !file.exists(working.directory) ) dir.create(working.directory)
+      
+      savedWD <- getwd()
+      setwd(working.directory)
+      on.exit(setwd(savedWD), add = TRUE)
+      inTempDir <- TRUE
+    }
+    # Either use user specified WINBUGS code, or automatically generate it.
+    # if WINBUGS code is provided manually, then use it; if not, automatically generate it.
+    if(!is.null(WinBUGS.code)){
+      WinBUGS.model <- WinBUGS.code
+      file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
+                working.directory)
+    }else{
+      write.bugs.model(n.x.clim,n.x.nonclim=NULL,n.x.factor=NULL,not.spatial,
+                         working.directory=working.directory)
+      WinBUGS.model <- "WINBUGS_code.txt"
     }
     #y.name <- y
     y <- data[,y]
@@ -184,9 +202,9 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     beta.top <- 2*n.x.clim
     # Now standardise the climate variables by mapping onto [0,1]
     x.clim.std <- apply(x.clim,2,function(x){
-        x.min <- min(x)
-        x.max <- max(x)
-        return((x-x.min)/(x.max-x.min))
+      x.min <- min(x)
+      x.max <- max(x)
+      return((x-x.min)/(x.max-x.min))
     })
     x.nonclim.names <- x.nonclim
     x.factor.names <- x.factor
@@ -203,44 +221,48 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         x.factor <- as.matrix(data[,x.factor])
       }
     }
-    # Set the clique parameters if not supplied, to in effect run with only one
-    # clique
-    if(missing(u.clique.start)){
+    if(!not.spatial){
+      # Set the clique parameters if not supplied, to in effect run with only one
+      # clique
+      if(missing(u.clique.start)){
         u.clique.start <- c(1,NA)
-    }
-    if(missing(u.clique.end)){
+      }
+      if(missing(u.clique.end)){
         u.clique.end <- c(length(y),NA)
-    }
-    if(missing(adj.clique.start)){
+      }
+      if(missing(adj.clique.start)){
         adj.clique.start <- c(1,NA)
-    }
-    if(missing(adj.clique.end)){
+      }
+      if(missing(adj.clique.end)){
         adj.clique.end <- c(length(adj),NA)
-    }
-    NClique <- length(u.clique.start)-1
-    if(missing(clique)){
+      }
+      NClique <- length(u.clique.start)-1
+      if(missing(clique)){
         clique <- rep(1,length(y))
-    }
-    if(missing(clique.i)){
+      }
+      if(missing(clique.i)){
         clique.i <- rep(1,length(y))
-    }
-    if (missing(u) & NClique==1){
+      }
+      if (missing(u) & NClique==1){
         u <- as.numeric(rep(NA,length(y)))
+      }
+      clique.length <- u.clique.end[-(NClique+1)]-u.clique.start[-(NClique+1)]+1
+      adj.length <- adj.clique.end[-(NClique+1)]-adj.clique.start[-(NClique+1)]+1
     }
-    clique.length <- u.clique.end[-(NClique+1)]-u.clique.start[-(NClique+1)]+1
-    adj.length <- adj.clique.end[-(NClique+1)]-adj.clique.start[-(NClique+1)]+1
     if(is.null(informative.priors$beta)){
-        informative.priors$beta <- FALSE
+      informative.priors$beta <- FALSE
     }
     if(is.null(informative.priors$beta0)){
-        informative.priors$beta0 <- FALSE
+      informative.priors$beta0 <- FALSE
     }
     if(is.null(informative.priors$ax)){
-        informative.priors$ax <- FALSE
+      informative.priors$ax <- FALSE
     }
-    # Can't give a clique with one observation to car.normal, so ignore these
-    NonSingletonClique <- sum(clique.length>1.5)
-    nonsingleton.clique.list <- c(which(clique.length>1.5),NA)
+    if(!not.spatial){
+      # Can't give a clique with one observation to car.normal, so ignore these
+      NonSingletonClique <- sum(clique.length>1.5)
+      nonsingleton.clique.list <- c(which(clique.length>1.5),NA)
+    }
     if(missing(initial.pars.input)){
         if(missing(constrain.beta)){
             initial.object <- generate.initial.values(y=y,x.clim=x.clim.std,
@@ -253,33 +275,6 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         constrain.beta <- initial.object$constrain.beta
     }else{ # If initial values supplied, use those
         initial.pars <- initial.pars.input
-    }
-    if(!is.null(WinBUGS.code)){
-        WinBUGS.model <- WinBUGS.code
-        if(!is.null(WinBUGS.code.location)){
-            file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
-                      working.directory)
-        }else{
-            if(!silent){
-                print(getwd())
-            }
-            file.copy(paste(savedWD,WinBUGS.code,sep="/"),
-                      working.directory)
-        }
-    }else{
-        if(is.null(x.nonclim)){
-            if(is.null(x.factor)){
-                WinBUGS.model <- write.bugs.model(n.x.clim)
-            }else{
-                WinBUGS.model <- write.bugs.model(n.x.clim,0,ncol(x.factor))
-            }
-        }else{
-            if(is.null(x.factor)){
-                WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim))
-            }else{
-                WinBUGS.model <- write.bugs.model(n.x.clim,ncol(x.nonclim),ncol(x.factor))
-            }
-        }
     }
     if(missing(constrain.beta)){
         constrain.beta <- matrix(rep(FALSE,2*n.x.clim),ncol=2)
@@ -360,30 +355,34 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
             }
         }
     }
-    car.tau <- 1/car.sigma^2
+    if(!not.spatial){
+      car.tau <- 1/car.sigma^2
+    }
     WinBUGS.data <- list(y=y,
                      x.clim=x.clim.std,
                      N=length(y),
-                     NClique=NClique,
-                     NonSingletonClique=NonSingletonClique,
-                     nonsingleton.clique.list=nonsingleton.clique.list,
-                     u.clique.start=u.clique.start,
-                     u.clique.end=u.clique.end,
-                     adj.clique.start=adj.clique.start,
-                     adj.clique.end=adj.clique.end,
-                     clique=clique,
-                     clique.i=clique.i,
                      NEnv=ncol(x.clim.std),
-                     car.tau=car.tau,
-                     adj=adj,
-                     num=num,
-                     u=u,
                      ax.mu=ax.mu,
                      ax.var=ax.var,
                      beta.mu=beta.mu,
                      beta.var=beta.var,
                      beta0.mu=beta0.mu,
                      beta0.var=beta0.var)
+    if(!not.spatial){
+      WinBUGS.data$NClique=NClique
+      WinBUGS.data$NonSingletonClique=NonSingletonClique
+      WinBUGS.data$nonsingleton.clique.list=nonsingleton.clique.list
+      WinBUGS.data$u.clique.start=u.clique.start
+      WinBUGS.data$u.clique.end=u.clique.end
+      WinBUGS.data$adj.clique.start=adj.clique.start
+      WinBUGS.data$adj.clique.end=adj.clique.end
+      WinBUGS.data$clique=clique
+      WinBUGS.data$clique.i=clique.i
+      WinBUGS.data$car.tau=car.tau
+      WinBUGS.data$adj=adj
+      WinBUGS.data$num=num
+      WinBUGS.data$u=u
+    }
     if(n.x.clim==1){
         WinBUGS.monitor <- c("beta","beta0","ax","az","deviance")
     }else{
@@ -392,8 +391,10 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     if(estimate.p){
         WinBUGS.monitor <- c(WinBUGS.monitor,"p")
     }
-    if(estimate.u){
+    if(!not.spatial){
+      if(estimate.u){
         WinBUGS.monitor <- c(WinBUGS.monitor,"u")
+      }
     }
     if(!is.null(x.nonclim)){
         WinBUGS.data$x.nonclim <- as.matrix(x.nonclim)
@@ -448,7 +449,6 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         gamma.mat[gamma.mat>20] <- 20 # To stop Inf in the line below (gives same result - 1)
         gamma.mat <- exp(gamma.mat)/(1+exp(gamma.mat))
     }
-    # Generate initial values for the spatial random effect u's
     x.clim.a.centre <- x.clim.std-ax.mat
     x.mat.ind <- (x.clim.a.centre > 0)+1
     beta.mat.prod <- array(dim=c(n.data,n.x.clim))
@@ -487,11 +487,14 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     pred.u <- predict(glmfit,type="link")
     mean.presence <- mean(data.temp$y)
     logit.mean.presence <- log(mean.presence/(1-mean.presence))
-    u.inits <- rep(NA,length(u))
-    # Dividing by 20 produces sensible values here
-    u.inits[data.temp$y==1] <- (max(pred.u)-pred.u[data.temp$y==1]-logit.mean.presence)/20
-    u.inits[data.temp$y==0] <- (pred.u[data.temp$y==0]-logit.mean.presence-max(pred.u))/20
-    u.inits[!is.na(u)] <- NA
+    if(!not.spatial){
+      # Generate initial values for the spatial random effect u's
+      u.inits <- rep(NA,length(u))
+      # Dividing by 20 produces sensible values here
+      u.inits[data.temp$y==1] <- (max(pred.u)-pred.u[data.temp$y==1]-logit.mean.presence)/20
+      u.inits[data.temp$y==0] <- (pred.u[data.temp$y==0]-logit.mean.presence-max(pred.u))/20
+      u.inits[!is.na(u)] <- NA
+    }
     for(i in 1:chains){
         if(i==1){
             if(n.x.clim==1){
@@ -521,7 +524,9 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
             print(paste("Initial values for chain",i,":"))
             print(WinBUGS.inits[[i]])
         }
-        WinBUGS.inits[[i]]$u <- u.inits
+        if(!not.spatial){
+          WinBUGS.inits[[i]]$u <- u.inits
+        }
         if(!is.null(no.starting.value)){
             for(j in 1:length(no.starting.value)){
                 eval(parse(text=paste("WinBUGS.inits[[",i,"]]$",no.starting.value[[j]]," <- NA",sep="")))

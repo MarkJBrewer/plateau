@@ -358,7 +358,6 @@ fit.bugs.nospatial.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         gamma.mat[gamma.mat>20] <- 20 # To stop Inf in the line below (gives same result - 1)
         gamma.mat <- exp(gamma.mat)/(1+exp(gamma.mat))
     }
-    # Generate initial values for the spatial random effect u's
     x.clim.a.centre <- x.clim.std-ax.mat
     x.mat.ind <- (x.clim.a.centre > 0)+1
     beta.mat.prod <- array(dim=c(n.data,n.x.clim))

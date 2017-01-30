@@ -2,26 +2,28 @@
 % Please edit documentation in R/envelope.predict.R
 \name{envelope.predict}
 \alias{envelope.predict}
-\title{Predict values for the plateau envelope models produced by \code{fit.glm.env} and
+\title{Calculate the plateau envelopes produced by \code{fit.glm.env} and
 \code{fit.bugs.env}.}
 \usage{
-envelope.predict(envelope.fit, newdata)
+envelope.predict(envelope.fit, x.clim.new)
 }
 \arguments{
 \item{envelope.fit}{The fitted object from either \code{fit.glm.env} or
 \code{fit.bugs.env}.}
 
-\item{newdata}{A matrix or data frame of new data for prediction.}
+\item{x.clim.new}{A matrix, having the same columns as \code{inputs$x.clim}, and
+containing the points in climate space at which to evaluate the
+envelope and produce predictions in space. \code{envelope.fit}.}
 }
 \value{
 A set of predictions from the supplied fitted model evaluated at the covariate values in
-object \code{newdata}.
+object \code{x.clim.new}.
 }
 \description{
-\code{envelope.predict} predicts values for the plateau envelope models produced by the functions
+\code{envelope.predict} predicts values for the plateau envelopes produced by the functions
 \code{fit.glm.env} and \code{fit.bugs.env}.
 }
 \seealso{
-\code{link{map.plot}}, \code{link{fit.bugs.env}}
+\code{link{envelope.plot}}, \code{link{fit.glm.env}}, \code{link{fit.bugs.env}}
 }
 

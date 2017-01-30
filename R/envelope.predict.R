@@ -1,24 +1,26 @@
-#' Predict values for the plateau envelope models produced by \code{fit.glm.env} and
+#' Calculate the plateau envelopes produced by \code{fit.glm.env} and
 #' \code{fit.bugs.env}.
 #'
-#' \code{envelope.predict} predicts values for the plateau envelope models produced by the functions
+#' \code{envelope.predict} predicts values for the plateau envelopes produced by the functions
 #' \code{fit.glm.env} and \code{fit.bugs.env}.
 #'
 #' @param envelope.fit The fitted object from either \code{fit.glm.env} or
 #' \code{fit.bugs.env}.
 #' 
-#' @param newdata A matrix or data frame containing columns of the climate variables in \code{envelope.fit}.
+#' @param x.clim.new A matrix, having the same columns as \code{inputs$x.clim}, and
+#' containing the points in climate space at which to evaluate the
+#' envelope and produce predictions in space. \code{envelope.fit}.
 #' 
 #' @return A set of predictions from the supplied fitted model evaluated at the covariate values in
-#' object \code{newdata}.
-#' @seealso \code{link{map.plot}}, \code{link{fit.bugs.env}}
+#' object \code{x.clim.new}.
+#' @seealso \code{link{envelope.plot}}, \code{link{fit.glm.env}}, \code{link{fit.bugs.env}}
 #' @export
-envelope.predict <- function(envelope.fit,newdata){
+envelope.predict <- function(envelope.fit,x.clim.new){
   x.clim <- as.matrix(envelope.fit$x.clim)
   x.clim.names <- colnames(x.clim)
   n.x.clim <- ncol(x.clim)
   
-  # modified standized part  
+  # modified standardised part  
   x.min <- apply(x.clim,2,min)
   x.max <- apply(x.clim,2,max)
   x.diff <- x.max-x.min
@@ -30,14 +32,7 @@ envelope.predict <- function(envelope.fit,newdata){
     return(anydata)
   }
   
-  scaleBack <- function(anydata){
-    for (ss in 1: ncol(x.clim) ) {
-      anydata[,ss] <- anydata[,ss] * x.diff[ss]+ x.min[ss]
-    }
-    return(anydata)
-  }
-  
-  newdata.std  <- scaleTo(newdata)
+  newdata.std  <- scaleTo(x.clim.new)
   x.clim.std <-   scaleTo(x.clim)
   
   beta.top <- 2*n.x.clim

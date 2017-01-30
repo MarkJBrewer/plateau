@@ -184,17 +184,6 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
       on.exit(setwd(savedWD), add = TRUE)
       inTempDir <- TRUE
     }
-    # Either use user specified WINBUGS code, or automatically generate it.
-    # if WINBUGS code is provided manually, then use it; if not, automatically generate it.
-    if(!is.null(WinBUGS.code)){
-      WinBUGS.model <- WinBUGS.code
-      file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
-                working.directory)
-    }else{
-      write.bugs.model(n.x.clim,n.x.nonclim=NULL,n.x.factor=NULL,not.spatial,
-                         working.directory=working.directory)
-      WinBUGS.model <- "WINBUGS_code.txt"
-    }
     #y.name <- y
     y <- data[,y]
     n.x.clim <- length(x.clim)
@@ -216,10 +205,25 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
       }else{
         x.nonclim <- as.matrix(data[,x.nonclim])
       }
+      n.x.nonclim <- ncol(x.nonclim)
     }else{
       if(!is.null(x.factor)){
         x.factor <- as.matrix(data[,x.factor])
       }
+    }
+    if(!is.null(x.factor)){
+      n.x.factor <- ncol(x.factor)
+    }
+    # Either use user specified WINBUGS code, or automatically generate it.
+    # if WINBUGS code is provided manually, then use it; if not, automatically generate it.
+    if(!is.null(WinBUGS.code)){
+      WinBUGS.model <- WinBUGS.code
+      file.copy(paste(WinBUGS.code.location,WinBUGS.code,sep="/"),
+                working.directory)
+    }else{
+      write.bugs.model(n.x.clim,n.x.nonclim,n.x.factor,not.spatial,
+                       working.directory=working.directory)
+      WinBUGS.model <- "WINBUGS_code.txt"
     }
     if(!not.spatial){
       # Set the clique parameters if not supplied, to in effect run with only one

@@ -207,12 +207,15 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
       }
       n.x.nonclim <- ncol(x.nonclim)
     }else{
+      n.x.nonclim <- 0
       if(!is.null(x.factor)){
         x.factor <- as.matrix(data[,x.factor])
       }
     }
     if(!is.null(x.factor)){
       n.x.factor <- ncol(x.factor)
+    }else{
+      n.x.factor <- 0
     }
     # Either use user specified WINBUGS code, or automatically generate it.
     # if WINBUGS code is provided manually, then use it; if not, automatically generate it.

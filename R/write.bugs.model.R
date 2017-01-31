@@ -24,30 +24,23 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
         x.clim.Calc2[i,e] <- max(x.clim.beta[i,e,1],x.clim.beta[i,e,2])
         x.clim.Calc[i,e] <- x.clim.Calc2[i,e]*abs(x.clim.C[i,e])
       }
-  
       $TEMP_CROSSSUM
-  
       #TEMP_FACTOR1
       #TEMP_NOC1
-
       logit(p[i]) <- x.clim.Total[i]
     }
     beta0.prec <- 1/beta0.var
     beta0.diff ~ dnorm(beta0.mu,beta0.prec)
     az ~ dnorm(0,0.1)
     beta0 <- az - exp(beta0.diff)
-  
     #TEMP_SPATIAL
-  
     #TEMP_FACTOR2
     #TEMP_NOC2
-  
     $ALL_FOR
-  
     $TEMP_GAMMA
   }"
   
-  TEMP_CROSSSUM2 <-"      for(e1 in 1:(NEnv-1)){
+  TEMP_CROSSSUM2 <-"for(e1 in 1:(NEnv-1)){
         for(e2 in 1:e1){
           x.clim.CalcCross[i,e1,e2] <- 0
         }
@@ -88,7 +81,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
       nonbeta[e] ~ dnorm(0,0.001)
     }"
   
-  TEMP_GAMMA <- "    for(e1 in 1:(NEnv-1)){
+  TEMP_GAMMA <- "for(e1 in 1:(NEnv-1)){
       gamma.temp[e1,1] <- 0
       for(e2 in (e1+1):NEnv){
         gamma.temp[e1,e2] ~ dunif(0,1)
@@ -105,7 +98,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
       gamma.temp[NEnv,e2] <- 0
     }"
 
-  TEMP_SPATIAL <- "    # the following few lines are for the spatial autocorrelation component
+  TEMP_SPATIAL <- "# the following few lines are for the spatial autocorrelation component
     for(i in 1:NonSingletonClique){
       clique.length[nonsingleton.clique.list[i]] <- u.clique.end[nonsingleton.clique.list[i]] - u.clique.start[nonsingleton.clique.list[i]] + 1
       adj.clique.length[nonsingleton.clique.list[i]] <- adj.clique.end[nonsingleton.clique.list[i]] - adj.clique.start[nonsingleton.clique.list[i]] + 1
@@ -116,7 +109,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
     }
     tau <- car.tau"
   
-  ALL_FOR <- "    for(e in 1:NEnv){
+  ALL_FOR <- "for(e in 1:NEnv){
       ax.prec[e] <- 1/ax.var[e]
       ax[e] ~ dnorm(ax.mu[e],ax.prec[e])  I(-1,2)
       beta.prec[e,1] <- 1/beta.var[e,1]
@@ -140,7 +133,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
   if (n.x.nonclim > 0.5){
     ED_BUG <- gsub("#TEMP_NOC1",TEMP_NOC1,ED_BUG,fixed=TRUE)
     ED_BUG <- gsub("#TEMP_NOC2",TEMP_NOC2,ED_BUG,fixed=TRUE)
-    ED_BUG <- gsub("logit(p[i]) <-",
+    ED_BUG <- gsub("logit(p[i]) <- ",
                    "logit(p[i]) <- x.nonclim.Total[i] + ",
                    ED_BUG,fixed=TRUE)
   }else{
@@ -150,7 +143,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
   if (n.x.factor > 0.5){
     ED_BUG <- gsub("#TEMP_FACTOR1",TEMP_FACTOR1,ED_BUG,fixed=TRUE)
     ED_BUG <- gsub("#TEMP_FACTOR2",TEMP_FACTOR2,ED_BUG,fixed=TRUE)
-    ED_BUG <- gsub("logit(p[i]) <-",
+    ED_BUG <- gsub("logit(p[i]) <- ",
                    "logit(p[i]) <- x.fac.Total[i] + ",
                    ED_BUG,fixed=TRUE)
   }else{
@@ -161,7 +154,7 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
   # Check whether spatial autocorrelation component is required
   if(!not.spatial){
     ED_BUG <- gsub("#TEMP_SPATIAL",TEMP_SPATIAL,ED_BUG,fixed=TRUE)
-    ED_BUG <- gsub("logit(p[i]) <-",
+    ED_BUG <- gsub("logit(p[i]) <- ",
                    "logit(p[i]) <- u[u.clique.start[clique[i]]+clique.i[i]-1] + ",
                    ED_BUG,fixed=TRUE)    
   }

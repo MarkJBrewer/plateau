@@ -1,7 +1,7 @@
 Package: plateau
 Title: Fit plateau climate envelopes in species distribution models for
     presence/absence data
-Version: 0.4.3
+Version: 0.4.8
 Authors@R: c(
     person("Mark J","Brewer",email="mark.brewer@bioss.ac.uk",role="cre"),
     person("Xiao","Feng",email="xiao.feng@okstate.edu",role="ctb"))

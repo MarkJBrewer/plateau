@@ -159,6 +159,25 @@ write.bugs.model <- function(n.x.clim,n.x.nonclim=0,n.x.factor=0,not.spatial=FAL
                    ED_BUG,fixed=TRUE)    
   }
   
+  # a special treatment for 1 climatic variable; more specifically, winbugs can not read a[1] if length of a is 1.
+  if (n.x.clim==1){
+    ED_BUG<- gsub("ax[e]",
+                  "ax",
+                  ED_BUG,fixed=TRUE)   
+    ED_BUG<- gsub("which.beta[e]",
+                  "which.beta",
+                  ED_BUG,fixed=TRUE)  
+    ED_BUG<- gsub("ax.prec[e]",
+                  "ax.prec",
+                  ED_BUG,fixed=TRUE) 
+    ED_BUG<- gsub("ax.var[e]",
+                  "ax.var",
+                  ED_BUG,fixed=TRUE) 
+    ED_BUG<- gsub("ax.mu[e]",
+                  "ax.mu",
+                  ED_BUG,fixed=TRUE) 
+  }
+  
   output_file_path <- paste(working.directory,"/WINBUGS_code.txt",sep="")
   writeLines(ED_BUG,output_file_path)
 }
